@@ -546,11 +546,11 @@ function genExamB() {
           المدة: ${dur}
         </div>
         <div class="hdr-box hdr-box-c">
-          ${esc(title)}<br>
-          <span style="font-size:10pt;font-weight:400">السنة الدراسية: ${hd.yearStart} - ${yr}</span>
+          ${esc(title)}
         </div>
         <div class="hdr-box hdr-box-l">
-          المستوى: ${esc(hd.level)}
+          المستوى: ${esc(hd.level)}<br>
+          السنة الدراسية: ${hd.yearStart} - ${yr}
         </div>
       </div>
 
