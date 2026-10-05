@@ -666,8 +666,8 @@ html, body {
 ===================================================================== */
 .dotted-line {
   border-bottom: 1px dashed #888;
-  margin: 3.5px 0;
-  height: 5px;
+  margin: 2px 0;
+  height: 18px;
 }
 
 .timeline-wrap {
