@@ -3,19 +3,30 @@
 ## Présentation du projet
 
 Générateur d'examens d'Histoire & Géographie en arabe (RTL) pour le collège tunisien.  
-Application web **single-page** sans backend : `index.html` + `style.css` + `app.js`.
+Application web **single-page** sans backend : `index.html` + `assets/css/style.css` + `assets/js/app.js`.
 
 ---
 
 ## Structure des fichiers
 
-| Fichier | Rôle |
-|---|---|
-| `index.html` | Squelette HTML : deux écrans (sélection modèle + app principale) |
-| `style.css` | Tous les styles UI + Modèle A + Modèle B + `@media print` |
-| `app.js` | État, rendu dynamique, gestion des événements, impression, JSON |
-| `README.md` | Documentation utilisateur |
-| `agent.md` | Contexte pour agents IA |
+```text
+exam-gen/
+├── index.html              ← Point d'entrée (HTML pur)
+├── README.md               ← Documentation utilisateur (affiché sur GitHub)
+├── CLAUDE.md               ← Ce fichier — instructions Claude Code
+├── .gitignore
+├── .nojekyll               ← Désactive Jekyll sur GitHub Pages
+├── assets/
+│   ├── css/
+│   │   └── style.css       ← Tous les styles UI + modèles + @media print
+│   └── js/
+│       └── app.js          ← État, rendu, formulaire, SVG, impression, JSON
+├── docs/
+│   └── agent.md            ← Contexte domaine pour agents IA
+└── .github/
+    └── workflows/
+        └── deploy.yml      ← Pipeline GitHub Actions → GitHub Pages
+```
 
 ---
 
