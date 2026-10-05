@@ -552,10 +552,13 @@ function genExamB() {
 
       <div class="separator">◆ &nbsp; ◆ &nbsp; ◆</div>
 
-      <div class="stu-line-b">
-        الإسم واللقب :&nbsp;............................................&nbsp;&nbsp;
-        القسم :&nbsp;..............&nbsp;&nbsp;
-        الرقم :&nbsp;..............
+      <div class="stu-row-b">
+        <div class="stu-line-b">
+          الإسم واللقب :&nbsp;............................................&nbsp;&nbsp;
+          القسم :&nbsp;..............&nbsp;&nbsp;
+          الرقم :&nbsp;..............
+        </div>
+        <div class="grade-box-b">............ / 20</div>
       </div>
 
       <div class="hw-note">2 ن + لوضوح الخط وسلامة اللغة</div>

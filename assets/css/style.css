@@ -561,11 +561,29 @@ html, body {
   font-family: sans-serif;
 }
 
+.model-b .stu-row-b {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 3mm;
+}
+
 .model-b .stu-line-b {
   font-size: 10.5pt;
   text-align: right;
-  margin-bottom: 3mm;
   font-family: 'Cairo', sans-serif;
+}
+
+.model-b .grade-box-b {
+  border: 1px solid #aaa;
+  border-radius: 8px;
+  padding: 4px 14px;
+  font-size: 12pt;
+  font-weight: 600;
+  text-align: center;
+  min-width: 75px;
+  font-family: 'Cairo', sans-serif;
+  flex-shrink: 0;
 }
 
 .model-b .sec-wrapper {
