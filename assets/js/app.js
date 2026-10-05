@@ -465,8 +465,6 @@ function genExamA() {
   const hd = S.header;
   const yr = parseInt(hd.yearStart) + 1;
   const dur = hd.duration === '30' ? '30 دقيقة' : 'ساعة';
-  const title = `${hd.examType} عدد ${hd.examNumber} في مادة ${hd.subject}`;
-
   let body = '';
   S.sections.forEach((sec, si) => {
     const nm = AR_ORDINALS[si] || `${si+1}`;
@@ -489,7 +487,7 @@ function genExamA() {
             المدة: ${dur}
           </td>
           <td class="hdr-cell-c">
-            ${esc(title)}
+            ${esc(hd.examType)} عدد ${hd.examNumber}<br>في مادة ${esc(hd.subject)}
           </td>
           <td class="hdr-cell-l">
             المستوى: ${esc(hd.level)}<br>
@@ -520,8 +518,6 @@ function genExamB() {
   const hd = S.header;
   const yr = parseInt(hd.yearStart) + 1;
   const dur = hd.duration === '30' ? '30 دقيقة' : 'ساعة';
-  const title = `${hd.examType} عدد ${hd.examNumber} في مادة ${hd.subject}`;
-
   let body = '';
   S.sections.forEach((sec, si) => {
     const nm = AR_ORDINALS[si] || `${si+1}`;
@@ -547,7 +543,7 @@ function genExamB() {
           المدة: ${dur}
         </div>
         <div class="hdr-box hdr-box-c">
-          ${esc(title)}
+          ${esc(hd.examType)} عدد ${hd.examNumber}<br>في مادة ${esc(hd.subject)}
         </div>
         <div class="hdr-box hdr-box-l">
           المستوى: ${esc(hd.level)}<br>
