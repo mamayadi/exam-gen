@@ -554,9 +554,7 @@ function genExamB() {
 
       <div class="stu-row-b">
         <div class="stu-line-b">
-          الإسم واللقب :&nbsp;............................................&nbsp;&nbsp;
-          القسم :&nbsp;..............&nbsp;&nbsp;
-          الرقم :&nbsp;..............
+          <span class="stu-label">الإسم واللقب :</span><span class="stu-name-line"></span><span class="stu-field">القسم :&nbsp;&nbsp;..............&nbsp;&nbsp;</span><span class="stu-field">الرقم :&nbsp;..............</span>
         </div>
         <div class="grade-box-b">............ / 20</div>
       </div>

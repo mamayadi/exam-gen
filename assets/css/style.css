@@ -569,9 +569,27 @@ html, body {
 }
 
 .model-b .stu-line-b {
+  display: flex;
+  align-items: baseline;
+  flex: 1;
+  margin-left: 10px;
   font-size: 10.5pt;
-  text-align: right;
   font-family: 'Cairo', sans-serif;
+  direction: rtl;
+}
+
+.model-b .stu-label {
+  white-space: nowrap;
+}
+
+.model-b .stu-name-line {
+  flex: 1;
+  border-bottom: 1.5px dotted #888;
+  margin: 0 5px 3px;
+}
+
+.model-b .stu-field {
+  white-space: nowrap;
 }
 
 .model-b .grade-box-b {
