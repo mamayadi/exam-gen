@@ -573,7 +573,9 @@ html, body {
 }
 
 .model-b .sec-pill {
-  display: inline-block;
+  display: block;
+  width: fit-content;
+  margin-left: auto;
   background: #2d3436;
   color: #fff;
   border-radius: 20px;
