@@ -502,7 +502,7 @@ html, body {
 }
 
 .model-a .q-item {
-  margin-bottom: 3mm;
+  margin-bottom: 6mm;
   page-break-inside: avoid;
 }
 
@@ -649,7 +649,7 @@ html, body {
 .model-b .q-box {
   border: 1px solid #ccc;
   border-radius: 9px;
-  padding: 7px 11px 5px;
+  padding: 7px 11px 10px;
   margin-bottom: 3mm;
   page-break-inside: avoid;
 }
