@@ -523,7 +523,6 @@ function genExamB() {
     const nm = AR_ORDINALS[si] || `${si+1}`;
     body += `<div class="sec-wrapper">
       <div class="sec-pill">القسم ${nm}: (${sec.points} ن)</div>
-      ${si === 0 ? `<div class="hw-note">2 ن + لوضوح الخط وسلامة اللغة</div>` : ''}
     `;
     sec.questions.forEach((q, qi) => {
       const pts = q.points ? ` (${q.points}ن)` : '';
@@ -558,6 +557,8 @@ function genExamB() {
         القسم :&nbsp;..............&nbsp;&nbsp;
         الرقم :&nbsp;..............
       </div>
+
+      <div class="hw-note">2 ن + لوضوح الخط وسلامة اللغة</div>
 
       ${body}
     </div>
