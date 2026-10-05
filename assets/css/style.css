@@ -569,13 +569,13 @@ html, body {
 }
 
 .model-b .sec-wrapper {
+  display: flex;
+  flex-direction: column;
   margin-top: 4mm;
 }
 
 .model-b .sec-pill {
-  display: block;
-  width: fit-content;
-  margin-left: auto;
+  align-self: flex-start;
   background: #2d3436;
   color: #fff;
   border-radius: 20px;
