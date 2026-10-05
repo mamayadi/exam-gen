@@ -102,6 +102,22 @@ map        → { imageData: 'data:image/...', imageName, imageWidth: '100%', leg
 
 ---
 
+## Règles pour les agents IA
+
+> Ces règles s'appliquent à tout agent (Claude Code, Copilot, etc.) travaillant sur ce projet.
+
+### Git — commits
+
+- **Ne jamais inclure `Co-Authored-By` dans les messages de commit.** Les commits appartiennent au développeur.
+- Messages de commit en français ou en anglais, format `type: description` (ex. `fix:`, `feat:`, `refactor:`).
+
+### Git — push
+
+- **Ne jamais exécuter `git push`.** Le push est une action manuelle réservée au développeur.
+- Créer le commit et s'arrêter là ; indiquer au développeur qu'il peut pousser quand il est prêt.
+
+---
+
 ## Décisions de conception
 
 | Décision | Raison |
