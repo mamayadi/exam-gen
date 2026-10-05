@@ -783,36 +783,32 @@ function showTab(tab) {
 }
 
 /**
- * Scale the A4 preview down to fit the available width on small screens.
- * Uses CSS transform so the print path is unaffected (transform: none !important
- * is set in @media print).
+ * Scale the A4 preview to fit the available width on small screens.
+ *
+ * We use CSS `zoom` (not transform) because zoom shrinks the element
+ * in the layout flow — the print-zone naturally wraps the reduced size
+ * and preview-panel centers it without any manual offset calculation.
+ * `zoom: 1 !important` in @media print resets it for full-A4 output.
  */
 function scalePreview() {
   const panel = document.getElementById('preview-panel');
-  const zone  = document.getElementById('print-zone');
   const exam  = document.getElementById('exam-a4');
-  if (!panel || !zone || !exam) return;
+  if (!panel || !exam) return;
 
-  // Reset inline styles set by a previous call
-  exam.style.transform       = '';
-  exam.style.transformOrigin = '';
-  zone.style.height          = '';
+  // Reset any previously applied scaling
+  exam.style.zoom = '';
 
   if (window.innerWidth >= 860) return;   // desktop — no scaling needed
 
-  // 210 mm = 794 px at 96 dpi (CSS reference pixel)
+  // 210 mm = 794 px at the CSS reference pixel (96 dpi)
   const A4_W  = 794;
-  const pad   = 24;                                  // preview-panel L+R padding
+  const pad   = 24;                       // preview-panel horizontal padding
   const avail = panel.clientWidth - pad;
   const scale = avail / A4_W;
 
-  if (scale >= 1) return;                            // container wider than A4
+  if (scale >= 1) return;                 // container already wider than A4
 
-  const naturalH = exam.offsetHeight;                // layout height before transform
-  exam.style.transformOrigin = 'top left';
-  exam.style.transform       = `scale(${scale})`;
-  // Collapse the whitespace left by the transform
-  zone.style.height          = (naturalH * scale) + 'px';
+  exam.style.zoom = scale;               // zoom affects layout → auto-centering works
 }
 
 window.addEventListener('resize', scalePreview);

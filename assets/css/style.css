@@ -729,7 +729,8 @@ html, body {
     min-height: auto !important;
     padding: 12mm 14mm 14mm !important;
     margin: 0 !important;
-    transform: none !important;
+    zoom: 1 !important;           /* reset mobile zoom for full-A4 print */
+    transform: none !important;   /* safety reset */
   }
 
   .exam-a4.model-b {
@@ -827,8 +828,8 @@ html, body {
   #screen-app.show-preview #form-panel          { display: none; }
   #screen-app.show-preview #preview-panel       { display: flex; }
 
-  /* A4 print-zone height is managed by JS (scalePreview) */
-  #print-zone { overflow: hidden; flex-shrink: 0; }
+  /* zoom on exam-a4 shrinks layout naturally — no overflow tricks needed */
+  #print-zone { flex-shrink: 0; }
 
   /* Touch-friendly tap targets */
   .btn    { min-height: 44px; }
