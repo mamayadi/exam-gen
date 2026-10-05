@@ -1,0 +1,26 @@
+# ── Système d'exploitation ──────────────────────────────────────────
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# ── Éditeurs ────────────────────────────────────────────────────────
+.vscode/settings.json
+.vscode/launch.json
+.idea/
+*.sublime-workspace
+*.swp
+*.swo
+*~
+
+# ── Logs & temporaires ──────────────────────────────────────────────
+*.log
+npm-debug.log*
+
+# ── Fichiers d'exam sauvegardés (JSON exports) ──────────────────────
+# Décommenter pour ignorer les sauvegardes locales :
+# examen_*.json

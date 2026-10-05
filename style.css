@@ -1,0 +1,755 @@
+/* =====================================================================
+   RESET & BASE
+===================================================================== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  height: 100%;
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  font-size: 14px;
+  color: #2d3436;
+  background: #f0f2f5;
+}
+
+/* =====================================================================
+   SCREEN MANAGEMENT
+===================================================================== */
+.screen { display: none; }
+.screen.active { display: flex; }
+
+/* =====================================================================
+   SCREEN 1 — MODEL SELECTION
+===================================================================== */
+#screen-model {
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  min-height: 100vh;
+  padding: 40px 20px 60px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.app-title {
+  font-size: 32px;
+  font-weight: 800;
+  color: #fff;
+  margin-bottom: 8px;
+  text-align: center;
+  text-shadow: 0 2px 4px rgba(0,0,0,.2);
+}
+
+.app-subtitle {
+  font-size: 15px;
+  color: rgba(255,255,255,.85);
+  margin-bottom: 48px;
+  text-align: center;
+}
+
+.model-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 28px;
+  max-width: 860px;
+  width: 100%;
+}
+
+.model-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 28px;
+  cursor: pointer;
+  border: 3px solid transparent;
+  transition: all .25s ease;
+  box-shadow: 0 4px 20px rgba(0,0,0,.12);
+}
+
+.model-card:hover {
+  border-color: #667eea;
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(102,126,234,.3);
+}
+
+.model-card h3 {
+  font-size: 19px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: #2d3436;
+}
+
+.model-card p {
+  font-size: 13px;
+  color: #636e72;
+  line-height: 1.6;
+  margin-bottom: 18px;
+}
+
+.model-preview-box {
+  background: #f8f9fa;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 12px;
+  font-family: 'Cairo', sans-serif;
+  direction: rtl;
+  font-size: 9.5px;
+  color: #2d3436;
+  line-height: 1.5;
+}
+
+/* =====================================================================
+   SCREEN 2 — MAIN APP
+===================================================================== */
+#screen-app {
+  height: 100vh;
+  overflow: hidden;
+  flex-direction: row;
+}
+
+/* ---- FORM PANEL ---- */
+#form-panel {
+  width: 430px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: #fff;
+  border-right: 1px solid #e0e4e8;
+}
+
+.fp-header {
+  background: #2d3436;
+  color: #fff;
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+  gap: 10px;
+}
+
+.fp-header h2 { font-size: 15px; font-weight: 600; }
+
+.fp-header-actions { display: flex; gap: 6px; }
+
+#form-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 14px;
+}
+
+#form-footer {
+  flex-shrink: 0;
+  padding: 12px 16px;
+  border-top: 1px solid #e0e4e8;
+  background: #f8f9fa;
+}
+
+/* ---- PREVIEW PANEL ---- */
+#preview-panel {
+  flex: 1;
+  height: 100vh;
+  overflow-y: auto;
+  background: #dfe6e9;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px 20px 40px;
+  gap: 16px;
+}
+
+.preview-toolbar {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+  order: 2;
+}
+
+#print-zone {
+  order: 1;
+}
+
+/* =====================================================================
+   FORM UI COMPONENTS
+===================================================================== */
+.form-card {
+  border: 1px solid #e0e4e8;
+  border-radius: 10px;
+  margin-bottom: 14px;
+  overflow: hidden;
+  background: #fff;
+}
+
+.form-card-header {
+  background: #f8f9fa;
+  padding: 9px 14px;
+  font-weight: 600;
+  font-size: 12.5px;
+  color: #495057;
+  border-bottom: 1px solid #e0e4e8;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.form-card-body {
+  padding: 12px 14px;
+}
+
+.form-row { display: flex; gap: 8px; margin-bottom: 8px; align-items: flex-end; }
+.form-row:last-child { margin-bottom: 0; }
+
+.fg {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.fg label {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #495057;
+  white-space: nowrap;
+}
+
+.fg input,
+.fg select,
+.fg textarea {
+  padding: 6px 9px;
+  border: 1px solid #ced4da;
+  border-radius: 6px;
+  font-size: 12.5px;
+  font-family: inherit;
+  width: 100%;
+  background: #fff;
+  transition: border-color .15s, box-shadow .15s;
+  color: #2d3436;
+}
+
+.fg input:focus,
+.fg select:focus,
+.fg textarea:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102,126,234,.15);
+}
+
+.fg textarea {
+  font-family: 'Cairo', 'Noto Naskh Arabic', sans-serif;
+  direction: rtl;
+  resize: vertical;
+  min-height: 56px;
+  line-height: 1.6;
+}
+
+.fg input[type="number"] { max-width: 100%; }
+
+/* Exam section in form */
+.es-form {
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  background: #fff;
+}
+
+.es-form-head {
+  background: #f1f3f5;
+  padding: 8px 12px;
+  border-bottom: 1px solid #dee2e6;
+  border-radius: 8px 8px 0 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.es-form-title {
+  font-weight: 700;
+  font-size: 13px;
+  flex: 1;
+  font-family: 'Cairo', sans-serif;
+  direction: rtl;
+  color: #2d3436;
+}
+
+.es-form-body { padding: 10px 12px; }
+
+.es-warn {
+  background: #fff3cd;
+  color: #856404;
+  font-size: 11px;
+  padding: 4px 10px;
+  border-bottom: 1px solid #ffc107;
+}
+
+/* Question in form */
+.q-form {
+  border: 1px solid #e9ecef;
+  border-radius: 6px;
+  margin-bottom: 7px;
+  padding: 9px 10px;
+  background: #fafbfc;
+}
+
+.q-form-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 7px;
+}
+
+.q-num {
+  background: #667eea;
+  color: #fff;
+  border-radius: 50%;
+  width: 21px;
+  height: 21px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+/* =====================================================================
+   BUTTONS
+===================================================================== */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 7px 13px;
+  border-radius: 7px;
+  border: none;
+  cursor: pointer;
+  font-size: 12.5px;
+  font-weight: 600;
+  transition: background .15s, transform .1s, box-shadow .15s;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.btn:active { transform: scale(.97); }
+.btn:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+.btn-primary { background: #667eea; color: #fff; }
+.btn-primary:hover:not(:disabled) { background: #5a6fd6; }
+.btn-success { background: #00b894; color: #fff; }
+.btn-success:hover:not(:disabled) { background: #00a381; }
+.btn-danger { background: #e17055; color: #fff; }
+.btn-danger:hover:not(:disabled) { background: #d35400; }
+.btn-warning { background: #fdcb6e; color: #2d3436; }
+.btn-warning:hover:not(:disabled) { background: #e9b84e; }
+.btn-secondary { background: #636e72; color: #fff; }
+.btn-secondary:hover:not(:disabled) { background: #4d5860; }
+.btn-ghost { background: transparent; color: #636e72; border: 1px solid #dee2e6; }
+.btn-ghost:hover:not(:disabled) { background: #f8f9fa; color: #2d3436; }
+.btn-sm { padding: 4px 9px; font-size: 11.5px; }
+.btn-xs { padding: 2px 6px; font-size: 10.5px; }
+
+.btn-icon {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 3px 5px;
+  border-radius: 4px;
+  color: #b2bec3;
+  font-size: 13px;
+  line-height: 1;
+  transition: background .15s, color .15s;
+}
+.btn-icon:hover { background: #f0f2f5; color: #636e72; }
+.btn-icon.danger:hover { background: #fdecea; color: #e17055; }
+
+/* Score counter */
+.score-bar {
+  text-align: center;
+  font-size: 14px;
+  font-weight: 700;
+  padding: 8px 12px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+.score-ok { background: #d4edda; color: #155724; }
+.score-warn { background: #fff3cd; color: #856404; }
+.score-error { background: #f8d7da; color: #721c24; }
+
+.warn-text { color: #e17055; font-size: 11px; margin-top: 3px; }
+.info-text { color: #74b9ff; font-size: 11px; margin-top: 3px; }
+
+/* =====================================================================
+   EXAM A4 CONTAINER
+===================================================================== */
+.exam-a4 {
+  width: 210mm;
+  min-height: 297mm;
+  background: #fff;
+  padding: 12mm 14mm 14mm;
+  box-shadow: 0 6px 28px rgba(0,0,0,.2);
+  direction: rtl;
+  font-family: 'Cairo', 'Noto Naskh Arabic', serif;
+  font-size: 11.5pt;
+  line-height: 1.65;
+  color: #000;
+  position: relative;
+}
+
+/* =====================================================================
+   MODEL A — CLASSIQUE
+===================================================================== */
+
+/* Double-line border around header */
+.model-a .hdr-wrap {
+  border: 3px double #000;
+  margin-bottom: 5mm;
+}
+
+.model-a .hdr-tbl {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: 'Cairo', sans-serif;
+}
+
+.model-a .hdr-tbl td {
+  border: 1px solid #000;
+  padding: 5px 8px;
+  vertical-align: middle;
+  font-size: 11pt;
+}
+
+.model-a .hdr-cell-r {
+  text-align: right;
+  width: 30%;
+}
+
+.model-a .hdr-cell-c {
+  text-align: center;
+  width: 40%;
+  font-size: 12pt;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+.model-a .hdr-cell-l {
+  text-align: left;
+  width: 30%;
+}
+
+.model-a .stu-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 3mm;
+  gap: 8px;
+}
+
+.model-a .stu-line {
+  font-size: 10.5pt;
+  flex: 1;
+  text-align: right;
+  padding-top: 4px;
+}
+
+.model-a .grade-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  flex-shrink: 0;
+}
+
+.model-a .grade-box {
+  border: 1.5px solid #000;
+  padding: 4px 14px;
+  font-size: 12pt;
+  font-weight: 600;
+  text-align: center;
+  min-width: 75px;
+  font-family: 'Cairo', sans-serif;
+}
+
+.model-a .hw-box {
+  border: 1.5px solid #000;
+  padding: 2px 8px;
+  font-size: 8.5pt;
+  text-align: center;
+  font-family: 'Cairo', sans-serif;
+}
+
+.model-a .sec-title {
+  font-size: 12.5pt;
+  font-weight: 700;
+  text-decoration: underline;
+  text-align: right;
+  margin: 5mm 0 2mm;
+  font-family: 'Cairo', sans-serif;
+}
+
+.model-a .q-item {
+  margin-bottom: 3mm;
+  page-break-inside: avoid;
+}
+
+.model-a .q-text {
+  font-size: 11pt;
+  text-align: right;
+  margin-bottom: 2mm;
+  font-family: 'Cairo', sans-serif;
+}
+
+/* =====================================================================
+   MODEL B — MODERNE
+===================================================================== */
+
+/* Double frame around entire exam page */
+.exam-a4.model-b {
+  border: 2px solid #555;
+  padding: 8mm 10mm;
+}
+
+.model-b .exam-inner {
+  border: 1px solid #999;
+  padding: 6mm 8mm;
+  min-height: calc(297mm - 30mm);
+}
+
+.model-b .hdr-boxes {
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  margin-bottom: 4mm;
+  /* RTL: first element = right side */
+  direction: rtl;
+}
+
+.model-b .hdr-box {
+  border: 1px solid #aaa;
+  border-radius: 10px;
+  padding: 7px 11px;
+  font-family: 'Cairo', sans-serif;
+}
+
+.model-b .hdr-box-r {
+  flex: 1;
+  text-align: right;
+  font-size: 10.5pt;
+  line-height: 1.7;
+}
+
+.model-b .hdr-box-c {
+  flex: 1.5;
+  background: #f0f0f0;
+  text-align: center;
+  font-size: 12.5pt;
+  font-weight: 700;
+  line-height: 1.6;
+}
+
+.model-b .hdr-box-l {
+  flex: 1;
+  text-align: left;
+  font-size: 10.5pt;
+  line-height: 1.7;
+}
+
+.model-b .separator {
+  text-align: center;
+  font-size: 15pt;
+  color: #666;
+  letter-spacing: 6px;
+  margin: 3mm 0 2mm;
+  font-family: sans-serif;
+}
+
+.model-b .stu-line-b {
+  font-size: 10.5pt;
+  text-align: right;
+  margin-bottom: 3mm;
+  font-family: 'Cairo', sans-serif;
+}
+
+.model-b .sec-wrapper {
+  margin-top: 4mm;
+}
+
+.model-b .sec-pill {
+  display: inline-block;
+  background: #2d3436;
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 18px;
+  font-size: 12pt;
+  font-weight: 700;
+  font-family: 'Cairo', sans-serif;
+  margin-bottom: 2mm;
+}
+
+.model-b .hw-note {
+  font-size: 8.5pt;
+  color: #555;
+  text-align: left;
+  margin-bottom: 3mm;
+  font-family: 'Cairo', sans-serif;
+}
+
+.model-b .q-box {
+  border: 1px solid #ccc;
+  border-radius: 9px;
+  padding: 7px 11px 5px;
+  margin-bottom: 3mm;
+  page-break-inside: avoid;
+}
+
+.model-b .q-text {
+  font-size: 11pt;
+  text-align: right;
+  margin-bottom: 2mm;
+  font-family: 'Cairo', sans-serif;
+}
+
+/* =====================================================================
+   SHARED EXAM ELEMENTS
+===================================================================== */
+.dotted-line {
+  border-bottom: 1px dashed #888;
+  margin: 3.5px 0;
+  height: 5px;
+}
+
+.timeline-wrap {
+  width: 100%;
+  margin: 3mm 0;
+  overflow: visible;
+}
+
+.map-center {
+  text-align: center;
+  margin: 3mm 0;
+}
+
+.map-img {
+  border: 1px solid #555;
+  max-width: 100%;
+  display: inline-block;
+}
+
+.map-legend-box {
+  border: 1.5px solid #333;
+  padding: 6px 10px;
+  margin-top: 3mm;
+  text-align: right;
+  font-family: 'Cairo', sans-serif;
+  direction: rtl;
+}
+
+.map-legend-title {
+  font-weight: 700;
+  font-size: 10pt;
+  margin-bottom: 4px;
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 3px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 5px 0;
+  direction: rtl;
+}
+
+.legend-num {
+  border: 1.5px solid #333;
+  min-width: 22px;
+  height: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9pt;
+  font-weight: 700;
+  flex-shrink: 0;
+  font-family: 'Cairo', sans-serif;
+}
+
+.legend-dash {
+  flex: 1;
+  border-bottom: 1.5px solid #555;
+  margin: 0 4px;
+}
+
+/* =====================================================================
+   PRINT STYLES
+===================================================================== */
+@media print {
+  @page {
+    size: A4;
+    margin: 0;
+  }
+
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Hide all UI chrome, show only the exam */
+  #screen-model  { display: none !important; }
+  .fp-header     { display: none !important; }
+  #form-body     { display: none !important; }
+  #form-footer   { display: none !important; }
+  .preview-toolbar { display: none !important; }
+
+  #form-panel {
+    display: none !important;
+  }
+
+  #screen-app {
+    display: block !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  #preview-panel {
+    display: block !important;
+    height: auto !important;
+    overflow: visible !important;
+    padding: 0 !important;
+    background: #fff !important;
+    width: 100% !important;
+  }
+
+  #print-zone {
+    display: block !important;
+    width: 210mm !important;
+    margin: 0 auto !important;
+  }
+
+  .exam-a4 {
+    box-shadow: none !important;
+    width: 210mm !important;
+    min-height: auto !important;
+    padding: 12mm 14mm 14mm !important;
+    margin: 0 !important;
+  }
+
+  .exam-a4.model-b {
+    padding: 8mm 10mm !important;
+  }
+
+  .model-b .exam-inner {
+    min-height: auto !important;
+  }
+
+  /* Prevent questions from splitting across pages */
+  .q-item, .q-box { page-break-inside: avoid !important; }
+
+  /* Allow section breaks between pages */
+  .sec-wrapper, .sec-title { page-break-before: auto !important; }
+}
+
+/* =====================================================================
+   MISC
+===================================================================== */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: #f1f1f1; }
+::-webkit-scrollbar-thumb { background: #b2bec3; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #636e72; }

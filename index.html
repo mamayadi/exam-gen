@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Générateur d'Examens — Histoire &amp; Géographie</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;900&family=Noto+Naskh+Arabic:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- =====================================================================
+     SCREEN 1 — MODEL SELECTION
+===================================================================== -->
+<div id="screen-model" class="screen active">
+  <h1 class="app-title">Générateur d'Examens</h1>
+  <p class="app-subtitle">Histoire &amp; Géographie — Collège tunisien (7e, 8e, 9e année)</p>
+
+  <div class="model-grid">
+
+    <!-- Modèle A -->
+    <div class="model-card" onclick="selectModel('A')">
+      <h3>Modèle A — Classique</h3>
+      <p>En-tête en tableau avec double filet, titres de sections soulignés, lignes pointillées pour les réponses.</p>
+      <div class="model-preview-box">
+        <div style="border:2.5px double #000; margin-bottom:5px;">
+          <table style="width:100%;border-collapse:collapse;">
+            <tr>
+              <td style="border:1px solid #000;padding:3px 5px;font-size:8.5px;width:30%">الأستاذة: ....</td>
+              <td style="border:1px solid #000;padding:3px 5px;font-size:8.5px;width:40%;text-align:center;font-weight:700">الفرض العادي عدد 1<br>في مادة التاريخ</td>
+              <td style="border:1px solid #000;padding:3px 5px;font-size:8.5px;width:30%;text-align:left">المستوى: التاسعة</td>
+            </tr>
+          </table>
+        </div>
+        <div style="font-size:8px;margin-bottom:4px">الإسم واللقب: .................. القسم: ........</div>
+        <div style="font-size:9px;font-weight:700;text-decoration:underline;margin:4px 0">القسم الأول (6 ن)</div>
+        <div style="font-size:8px;margin:2px 0">1- حرر فقرة متماسكة... <span style="font-size:7.5px">(3ن)</span></div>
+        <div style="border-bottom:1px dashed #888;margin:3px 0;height:4px"></div>
+        <div style="border-bottom:1px dashed #888;margin:3px 0;height:4px"></div>
+        <div style="border-bottom:1px dashed #888;margin:3px 0;height:4px"></div>
+      </div>
+    </div>
+
+    <!-- Modèle B -->
+    <div class="model-card" onclick="selectModel('B')">
+      <h3>Modèle B — Moderne</h3>
+      <p>Double cadre décoratif, en-tête à boîtes arrondies, titres de sections en pilules colorées.</p>
+      <div class="model-preview-box">
+        <div style="border:1.5px solid #555;border-radius:5px;padding:5px;outline:1px solid #999;outline-offset:3px;">
+          <div style="display:flex;gap:4px;direction:rtl;margin-bottom:5px;">
+            <div style="flex:1;border:1px solid #aaa;border-radius:5px;padding:3px 5px;font-size:8px;text-align:right">الأستاذة: ...<br>المدة: ساعة</div>
+            <div style="flex:1.5;border:1px solid #aaa;border-radius:5px;padding:3px 5px;font-size:8px;background:#f0f0f0;text-align:center;font-weight:700">الفرض العادي عدد 1<br>في مادة التاريخ</div>
+            <div style="flex:1;border:1px solid #aaa;border-radius:5px;padding:3px 5px;font-size:8px;text-align:left">التاسعة أساسي<br>2025 - 2026</div>
+          </div>
+          <div style="text-align:center;font-size:11px;color:#666;margin:2px 0;letter-spacing:4px">◆ ◆ ◆</div>
+          <div style="display:inline-block;background:#2d3436;color:#fff;border-radius:12px;padding:1px 10px;font-size:8px;margin:3px 0">القسم الأول (6 ن)</div><br>
+          <div style="border:1px solid #ccc;border-radius:4px;padding:4px 6px;font-size:8px;margin-top:3px">1- حرر فقرة متماسكة... <span style="font-size:7.5px">(3ن)</span>
+            <div style="border-bottom:1px dashed #aaa;margin:3px 0;height:3px"></div>
+            <div style="border-bottom:1px dashed #aaa;margin:3px 0;height:3px"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- =====================================================================
+     SCREEN 2 — MAIN APP
+===================================================================== -->
+<div id="screen-app" class="screen">
+
+  <!-- FORM PANEL -->
+  <div id="form-panel">
+    <div class="fp-header">
+      <h2>Configuration de l'examen</h2>
+      <div class="fp-header-actions">
+        <button class="btn btn-secondary btn-sm" onclick="changeModel()">← Modèle</button>
+      </div>
+    </div>
+
+    <div id="form-body"></div>
+
+    <div id="form-footer"></div>
+  </div>
+
+  <!-- PREVIEW PANEL -->
+  <div id="preview-panel">
+    <div id="print-zone">
+      <div id="exam-a4" class="exam-a4"></div>
+    </div>
+
+    <div class="preview-toolbar">
+      <button class="btn btn-success" id="btn-print" onclick="printExam()">🖨 Imprimer / PDF</button>
+      <button class="btn btn-primary" onclick="saveExam()">💾 Sauvegarder JSON</button>
+      <label class="btn btn-secondary" style="cursor:pointer;">
+        📂 Charger JSON
+        <input type="file" accept=".json" onchange="loadExam(event)" style="display:none">
+      </label>
+      <button class="btn btn-warning" onclick="resetExam()">↺ Réinitialiser</button>
+    </div>
+  </div>
+
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
