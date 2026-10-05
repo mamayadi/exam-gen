@@ -457,6 +457,7 @@ function renderExam() {
   el.setAttribute('dir', 'rtl');
   el.setAttribute('lang', 'ar');
   el.innerHTML = S.model === 'A' ? genExamA() : genExamB();
+  requestAnimationFrame(scalePreview);
 }
 
 /* ── MODEL A ── */
@@ -767,6 +768,54 @@ function esc(str) {
 function sel(current, value) {
   return current === value ? 'selected' : '';
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// RESPONSIVE — MOBILE TAB SWITCHING & A4 SCALING
+// ─────────────────────────────────────────────────────────────────────────────
+
+/** Switch between Formulaire / Aperçu on mobile */
+function showTab(tab) {
+  document.getElementById('screen-app').classList.toggle('show-preview', tab === 'preview');
+  document.querySelectorAll('#mobile-tabs .tab-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.tab === tab);
+  });
+  if (tab === 'preview') requestAnimationFrame(scalePreview);
+}
+
+/**
+ * Scale the A4 preview down to fit the available width on small screens.
+ * Uses CSS transform so the print path is unaffected (transform: none !important
+ * is set in @media print).
+ */
+function scalePreview() {
+  const panel = document.getElementById('preview-panel');
+  const zone  = document.getElementById('print-zone');
+  const exam  = document.getElementById('exam-a4');
+  if (!panel || !zone || !exam) return;
+
+  // Reset inline styles set by a previous call
+  exam.style.transform       = '';
+  exam.style.transformOrigin = '';
+  zone.style.height          = '';
+
+  if (window.innerWidth >= 860) return;   // desktop — no scaling needed
+
+  // 210 mm = 794 px at 96 dpi (CSS reference pixel)
+  const A4_W  = 794;
+  const pad   = 24;                                  // preview-panel L+R padding
+  const avail = panel.clientWidth - pad;
+  const scale = avail / A4_W;
+
+  if (scale >= 1) return;                            // container wider than A4
+
+  const naturalH = exam.offsetHeight;                // layout height before transform
+  exam.style.transformOrigin = 'top left';
+  exam.style.transform       = `scale(${scale})`;
+  // Collapse the whitespace left by the transform
+  zone.style.height          = (naturalH * scale) + 'px';
+}
+
+window.addEventListener('resize', scalePreview);
 
 // ─────────────────────────────────────────────────────────────────────────────
 // INIT

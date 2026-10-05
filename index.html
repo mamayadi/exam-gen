@@ -72,6 +72,12 @@
 ===================================================================== -->
 <div id="screen-app" class="screen">
 
+  <!-- Mobile tab bar — hidden on desktop via CSS -->
+  <div id="mobile-tabs" class="mobile-tabs">
+    <button class="tab-btn active" data-tab="form"    onclick="showTab('form')">⚙ Formulaire</button>
+    <button class="tab-btn"        data-tab="preview" onclick="showTab('preview')">👁 Aperçu</button>
+  </div>
+
   <!-- FORM PANEL -->
   <div id="form-panel">
     <div class="fp-header">

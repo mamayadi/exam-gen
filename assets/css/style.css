@@ -729,6 +729,7 @@ html, body {
     min-height: auto !important;
     padding: 12mm 14mm 14mm !important;
     margin: 0 !important;
+    transform: none !important;
   }
 
   .exam-a4.model-b {
@@ -753,3 +754,117 @@ html, body {
 ::-webkit-scrollbar-track { background: #f1f1f1; }
 ::-webkit-scrollbar-thumb { background: #b2bec3; border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: #636e72; }
+
+/* =====================================================================
+   RESPONSIVE — MOBILE TAB BAR
+===================================================================== */
+.mobile-tabs {
+  display: none;           /* hidden on desktop */
+  flex-shrink: 0;
+  background: #fff;
+  border-bottom: 2px solid #e0e4e8;
+  z-index: 10;
+}
+
+.tab-btn {
+  flex: 1;
+  height: 48px;
+  padding: 0 8px;
+  border: none;
+  background: transparent;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #636e72;
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -2px;
+  transition: color .15s, border-color .15s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.tab-btn.active {
+  color: #667eea;
+  border-bottom-color: #667eea;
+}
+
+/* =====================================================================
+   RESPONSIVE — TABLET & MOBILE  (< 860 px)
+===================================================================== */
+@media (max-width: 860px) {
+
+  /* ── Screen 1 : model cards ── */
+  #screen-model { padding: 32px 16px 48px; }
+
+  /* ── Screen 2 : stack panels ── */
+  #screen-app {
+    flex-direction: column;
+    height: 100vh;
+    height: 100dvh;   /* Safari 15.4+ / iOS 15.4+ */
+    overflow: hidden;
+  }
+
+  .mobile-tabs { display: flex; }
+
+  /* Form panel takes all remaining height */
+  #form-panel {
+    width: 100%;
+    height: auto;
+    flex: 1;
+    min-height: 0;     /* allow inner flex scroll */
+    border-right: none;
+  }
+
+  /* Preview panel full width */
+  #preview-panel {
+    width: 100%;
+    flex: 1;
+    min-height: 0;
+    padding: 16px 12px 28px;
+  }
+
+  /* Tab-driven visibility (JS toggles .show-preview on #screen-app) */
+  #screen-app:not(.show-preview) #preview-panel { display: none; }
+  #screen-app.show-preview #form-panel          { display: none; }
+  #screen-app.show-preview #preview-panel       { display: flex; }
+
+  /* A4 print-zone height is managed by JS (scalePreview) */
+  #print-zone { overflow: hidden; flex-shrink: 0; }
+
+  /* Touch-friendly tap targets */
+  .btn    { min-height: 44px; }
+  .btn-sm { min-height: 40px; }
+
+  /* Preview toolbar */
+  .preview-toolbar { flex-wrap: wrap; justify-content: center; }
+}
+
+/* =====================================================================
+   RESPONSIVE — SMALL MOBILE  (< 540 px)
+===================================================================== */
+@media (max-width: 540px) {
+
+  /* Screen 1 : single column */
+  .model-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .app-title    { font-size: 26px; }
+  .app-subtitle { font-size: 13px; margin-bottom: 24px; }
+  .model-card   { padding: 20px 16px; }
+
+  /* Form : allow rows to wrap */
+  .form-row { flex-wrap: wrap; }
+
+  /* Form header compact */
+  .fp-header   { padding: 11px 14px; }
+  .fp-header h2 { font-size: 14px; }
+
+  /* Form body & footer */
+  #form-body  { padding: 10px 10px; }
+  #form-footer { padding: 10px 12px; }
+
+  /* Footer buttons fill row */
+  #form-footer > div { flex-wrap: wrap; }
+  #form-footer .btn  { flex: 1 1 40%; justify-content: center; font-size: 12px; }
+}
