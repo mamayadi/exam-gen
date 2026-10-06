@@ -57,8 +57,8 @@ let S = {
     }
   ],
   decor: { watermark: 'europe' | 'compass' | 'image' | 'none', imageData, imageName }, // filigrane du Modèle C
-  opts:  { icons: boolean, closing: string, autoModel: boolean, bw: boolean }, // bw = classe .bw (noir et blanc)            // options communes
-  title: string,          // thème/chapitre facultatif ; nom affiché = autoTitle() (en-tête) + thème — voir examTitle()
+  opts:  { icons: boolean, closing: string, bw: boolean }, // bw = classe .bw (noir et blanc)            // options communes
+  seq: number | null,     // numéro ajouté au nom si un examen enregistré porte déjà le même nom — voir computeSeq() ; nom affiché = examTitle()
   docId: string | null    // id dans la bibliothèque (null = jamais enregistré)
 }
 ```
@@ -101,6 +101,14 @@ Changement d'état
 ---
 
 ## Conventions de code
+
+- **Interface en arabe, `<html lang="ar" dir="rtl">`** : tous les textes affichés (formulaire, boutons, messages, dialogues) sont en arabe.
+  Préférer les propriétés logiques (`margin-inline-start`, `padding-inline-start`) aux `left/right` dans le CSS de l'interface ;
+  le formulaire est le premier élément de `#screen-app` (donc à droite en RTL), l'aperçu le second (à gauche).
+- **Thème de l'interface** : bloc « UI THEME » de `style.css` (variables `--brand`, `--slate`, `--accent`, `--line`, `--r-*`…).
+  Rôles des boutons : `.btn-primary` (bleu, enregistrer), `.btn-success` (ardoise, imprimer), `.btn-share` (ocre, partager PDF) ;
+  vert / ambre / rouge réservés aux états (total, alertes). Réutiliser les variables plutôt que des couleurs en dur.
+- Un nom arabe inséré dans une phrase arabe/latine passe par `iso()` (isolat Unicode) pour garder l'ordre de lecture.
 
 - Échapper tout contenu utilisateur vers le DOM HTML avec `esc(str)`.
 - Les IDs d'objets (sections, questions) sont des entiers générés par `gid()` ; ne jamais utiliser l'index de tableau comme identifiant stable.

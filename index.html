@@ -1,9 +1,11 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Générateur d'Examens — Histoire &amp; Géographie</title>
+  <meta name="theme-color" content="#1f5f8b">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Crect width='48' height='48' rx='12' fill='%231f5f8b'/%3E%3Cpath d='M14 9h15l8 8v22a2 2 0 0 1-2 2H14a2 2 0 0 1-2-2V11a2 2 0 0 1 2-2z' fill='%23fff'/%3E%3Cpath d='M17 24h14M17 29h14M17 34h9' stroke='%231f5f8b' stroke-width='2.2' stroke-linecap='round'/%3E%3Ccircle cx='35' cy='35' r='8.5' fill='%23b9761a'/%3E%3C/svg%3E">
+  <title>مولّد الفروض — التاريخ والجغرافيا</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;900&family=Noto+Naskh+Arabic:wght@400;600;700&display=swap" rel="stylesheet" crossorigin="anonymous">
@@ -18,17 +20,30 @@
 
   <!-- Mobile tab bar — hidden on desktop via CSS -->
   <div id="mobile-tabs" class="mobile-tabs">
-    <button class="tab-btn active" data-tab="form"    onclick="showTab('form')">⚙ Formulaire</button>
-    <button class="tab-btn"        data-tab="preview" onclick="showTab('preview')">👁 Aperçu</button>
+    <button class="tab-btn active" data-tab="form"    onclick="showTab('form')">⚙ التحرير</button>
+    <button class="tab-btn"        data-tab="preview" onclick="showTab('preview')">👁 المعاينة</button>
   </div>
 
   <!-- FORM PANEL -->
   <div id="form-panel">
     <div class="fp-header">
-      <h2>Générateur d'Examens</h2>
+      <div class="brand">
+        <svg class="brand-logo" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <rect width="48" height="48" rx="12" fill="rgba(255,255,255,.16)"/>
+          <path d="M14 9h15l8 8v22a2 2 0 0 1-2 2H14a2 2 0 0 1-2-2V11a2 2 0 0 1 2-2z" fill="#fff"/>
+          <path d="M29 9v8h8" fill="none" stroke="#c9d9e6" stroke-width="1.6" stroke-linejoin="round"/>
+          <path d="M17 24h14M17 29h14M17 34h9" stroke="#1f5f8b" stroke-width="2.2" stroke-linecap="round"/>
+          <circle cx="35" cy="35" r="8.5" fill="#b9761a"/>
+          <path d="M35 28.5l1.9 5.2 5.2 1.9-5.2 1.9L35 42.7l-1.9-5.2L27.9 35.6l5.2-1.9z" fill="#fff"/>
+        </svg>
+        <div class="brand-text">
+          <h2>مولّد الفروض</h2>
+          <small>التاريخ والجغرافيا</small>
+        </div>
+      </div>
       <div class="fp-header-actions">
-        <button class="btn btn-light btn-sm" onclick="openLibrary()">📚 Mes examens</button>
-        <button class="btn btn-light btn-sm" onclick="newExam()">➕ Nouvel examen</button>
+        <button class="btn btn-light btn-sm" onclick="openLibrary()">📚 فروضي</button>
+        <button class="btn btn-light btn-sm" onclick="newExam()">➕ فرض جديد</button>
       </div>
     </div>
 
@@ -44,7 +59,7 @@
     </div>
 
     <div class="preview-actions">
-      <button class="btn btn-share btn-lg btn-pdf" data-label="📤 Partager en PDF" onclick="sharePDF()">📤 Partager en PDF</button>
+      <button class="btn btn-share btn-lg btn-pdf" data-label="📤 مشاركة PDF" onclick="sharePDF()">📤 مشاركة PDF</button>
     </div>
 
   </div>
@@ -54,21 +69,21 @@
 <!-- Short printing help (shown before the browser print dialog) -->
 <div id="print-help" class="modal-backdrop" hidden>
   <div class="modal" role="dialog" aria-labelledby="print-help-title">
-    <h3 id="print-help-title">🖨 Imprimer ou créer un PDF</h3>
+    <h3 id="print-help-title">🖨 الطباعة أو إنشاء ملف PDF</h3>
     <p id="print-help-over" class="modal-warn" hidden>
-      ⚠ Attention : l'examen fait plus d'une page.</p>
+      ⚠ تنبيه : الفرض يتجاوز صفحة واحدة.</p>
     <ol>
-      <li>Une fenêtre d'impression va s'ouvrir.</li>
-      <li><b>Pour un fichier PDF</b> : à la ligne « Destination », choisissez
-        <b>« Enregistrer au format PDF »</b>, puis cliquez sur <b>Enregistrer</b>.</li>
-      <li><b>Pour imprimer sur papier</b> : choisissez votre imprimante, puis <b>Imprimer</b>.</li>
+      <li>ستُفتح نافذة الطباعة.</li>
+      <li><b>للحصول على ملف PDF</b> : في خانة «الوجهة» اختر
+        <b>«حفظ بتنسيق PDF»</b> ثم اضغط على <b>حفظ</b>.</li>
+      <li><b>للطباعة على الورق</b> : اختر طابعتك ثم اضغط على <b>طباعة</b>.</li>
     </ol>
-    <p class="modal-tip">💡 Pour envoyer l'examen (WhatsApp, e-mail…), utilisez plutôt
-      <b>📤 Partager en PDF</b>.</p>
-    <label class="chk"><input type="checkbox" id="print-help-skip"> Ne plus afficher ce message</label>
+    <p class="modal-tip">💡 لإرسال الفرض (واتساب، بريد…) استعمل بدلاً من ذلك
+      <b>📤 مشاركة PDF</b>.</p>
+    <label class="chk"><input type="checkbox" id="print-help-skip"> عدم إظهار هذه الرسالة مرة أخرى</label>
     <div class="modal-actions">
-      <button class="btn btn-ghost" onclick="closePrintHelp(false)">Annuler</button>
-      <button class="btn btn-success" onclick="closePrintHelp(true)">Continuer ➜</button>
+      <button class="btn btn-ghost" onclick="closePrintHelp(false)">إلغاء</button>
+      <button class="btn btn-success" onclick="closePrintHelp(true)">متابعة ⬅</button>
     </div>
   </div>
 </div>
@@ -77,18 +92,18 @@
 <div id="library" class="modal-backdrop" hidden onclick="if (event.target === this) closeLibrary()">
   <div class="modal modal-lg" role="dialog" aria-labelledby="lib-title">
     <div class="lib-head">
-      <h3 id="lib-title">📚 Mes examens</h3>
-      <button class="btn-icon" title="Fermer" onclick="closeLibrary()">✕</button>
+      <h3 id="lib-title">📚 فروضي</h3>
+      <button class="btn-icon" title="إغلاق" onclick="closeLibrary()">✕</button>
     </div>
     <input id="lib-search" class="lib-search" type="search"
-      placeholder="🔍 Rechercher (nom, matière, niveau…)" oninput="renderLibraryList()">
+      placeholder="🔍 بحث (الاسم، المادة، المستوى…)" oninput="renderLibraryList()">
     <div id="lib-list" class="lib-list"></div>
     <div class="lib-foot">
-      <p class="lib-note">Les examens sont gardés dans ce navigateur, sur cet ordinateur.
-        Pensez à faire de temps en temps une sauvegarde dans un fichier (clé USB, e-mail…).</p>
+      <p class="lib-note">الفروض محفوظة في هذا المتصفح وعلى هذا الحاسوب.
+        يُستحسن حفظ نسخة احتياطية في ملف من حين لآخر (مفتاح USB، بريد…).</p>
       <div class="lib-foot-btns">
-        <button class="btn btn-ghost btn-sm" onclick="exportAll()">⬇ Sauvegarder tous mes examens</button>
-        <label class="btn btn-ghost btn-sm">⬆ Importer un fichier
+        <button class="btn btn-ghost btn-sm" onclick="exportAll()">⬇ حفظ نسخة احتياطية من كل فروضي</button>
+        <label class="btn btn-ghost btn-sm">⬆ استيراد ملف
           <input type="file" accept=".json" hidden onchange="importFile(event)"></label>
       </div>
     </div>
@@ -107,12 +122,12 @@
 <!-- PDF ready: share or download (needs a fresh tap on phones) -->
 <div id="pdf-ready" class="modal-backdrop" hidden onclick="if (event.target === this) closePdfReady()">
   <div class="modal" role="dialog" aria-labelledby="pdf-title">
-    <h3 id="pdf-title">📄 Le PDF est prêt</h3>
+    <h3 id="pdf-title">📄 ملف PDF جاهز</h3>
     <p id="pdf-name" class="pdf-name" dir="auto"></p>
     <div class="pdf-actions">
-      <button id="pdf-share" class="btn btn-share btn-lg btn-block" onclick="doSharePdf()">📤 Partager (WhatsApp, e-mail…)</button>
-      <button class="btn btn-primary btn-lg btn-block" onclick="downloadPdf()">⬇ Télécharger le PDF</button>
-      <button class="btn btn-ghost btn-block" onclick="closePdfReady()">Fermer</button>
+      <button id="pdf-share" class="btn btn-share btn-lg btn-block" onclick="doSharePdf()">📤 مشاركة (واتساب، بريد…)</button>
+      <button class="btn btn-primary btn-lg btn-block" onclick="downloadPdf()">⬇ تنزيل ملف PDF</button>
+      <button class="btn btn-ghost btn-block" onclick="closePdfReady()">إغلاق</button>
     </div>
   </div>
 </div>

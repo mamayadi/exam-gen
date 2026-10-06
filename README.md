@@ -25,6 +25,12 @@ exam-gen/
 
 ---
 
+## Langue et sens de lecture
+
+L'**interface est entièrement en arabe, de droite à gauche** (formulaire, boutons, messages, « فروضي »),
+comme les examens générés. Sur ordinateur, le **formulaire est à droite** et l'**aperçu à gauche** ;
+sur téléphone, deux onglets (التحرير / المعاينة). La documentation du dépôt (README, CLAUDE.md) reste en français.
+
 ## Utilisation
 
 ### Étape 1 — Choisir le modèle
@@ -47,7 +53,7 @@ Onze modèles sont disponibles (miniatures générées automatiquement à partir
 
 Option **⚫ Noir et blanc** (cochée par défaut) : tous les modèles passent en noir pur sur blanc — pas de fonds teintés (qui deviennent un gris tacheté à la photocopie), traits noirs, carte d'Europe réduite à des contours légers. L'aperçu montre exactement ce qui sera imprimé ; décocher pour une version en couleur.
 
-Options communes : icône par type de question (plume, livre, sablier, carte), phrase de fin (« بالتوفيق والنجاح »…), et style automatique selon la matière (Histoire → Carthage, Géographie → Globe). Dans les modèles décorés, une section contenant une seule question n'affiche pas de numéro.
+Options communes : icône par type de question (plume, livre, sablier, carte), phrase de fin (« بالتوفيق والنجاح »…). Dans les modèles décorés, une section contenant une seule question n'affiche pas de numéro.
 
 | Modèle A — Classique | Modèle B — Moderne |
 |---|---|
@@ -125,8 +131,11 @@ Une petite fenêtre d'aide explique comment choisir « Enregistrer au format PDF
 - Les questions ne sont pas coupées entre deux pages (`page-break-inside: avoid`).
 
 ### 📤 Partager en PDF (ordinateur et téléphone)
-Crée un vrai fichier PDF A4 dans le navigateur (≈ 0,5 Mo par page, polices arabes incluses), puis propose :
-**Partager** (menu de partage du téléphone : WhatsApp, e-mail…) ou **Télécharger le PDF**.
+Crée un vrai fichier PDF A4 dans le navigateur (≈ 0,6 à 1 Mo par page, polices arabes incluses) puis,
+**en un seul appui**, ouvre directement le menu de partage du téléphone (WhatsApp, e-mail…).
+Sur ordinateur sans menu de partage, le PDF est simplement téléchargé.
+Si le téléphone refuse d'ouvrir le menu (délai dépassé), une fenêtre « Le PDF est prêt » propose **Partager** ou **Télécharger**.
+Les outils PDF sont préchargés en arrière-plan après l'ouverture de la page.
 
 - Sur téléphone/tablette, le bouton **Imprimer** crée directement le PDF (l'impression du navigateur y est souvent inopérante,
   notamment dans les navigateurs intégrés de WhatsApp/Messenger). Le PDF peut ensuite être imprimé depuis le téléphone.
@@ -140,9 +149,11 @@ Crée un vrai fichier PDF A4 dans le navigateur (≈ 0,5 Mo par page, polices ar
 ## Mes examens (enregistrement et historique)
 
 ### Nom de l'examen
-Le nom est **automatique** et se met à jour en direct à partir de l'en-tête :
-`الفرض العادي عدد 1 – التاريخ – التاسعة أساسي – 2025/2026`.
-Le champ facultatif **Thème / chapitre** est ajouté à la fin (ex. `… – الحرب العالمية الأولى`).
+Le nom est **entièrement automatique** et se met à jour en direct à partir de l'en-tête :
+`الفرض التأليفي عدد 1 – التاريخ – التاسعة أساسي – 2026/2027`.
+Si un examen enregistré porte déjà exactement ce nom, un **numéro** est ajouté avant l'année :
+`… – التاسعة أساسي – 1 – 2026/2027`, puis `… – 2 – 2026/2027`, etc.
+(un numéro libéré par une suppression est réutilisé ; un numéro déjà attribué ne change pas tout seul).
 Ce nom sert à retrouver l'examen dans « Mes examens » ; il n'est pas imprimé.
 
 ### Enregistrer

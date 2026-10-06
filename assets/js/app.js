@@ -30,7 +30,7 @@ let S = {
     yearStart: new Date().getFullYear(),
   },
   sections: [],
-  title: '',              // name shown in « Mes examens » (not printed)
+  seq: null,              // 1, 2, 3… added to the name when an exam with the same name exists (see computeSeq)
   docId: null,            // id in the library (null = never saved)
   decor: defaultDecor(),  // Model C watermark
   opts: defaultOpts()     // options shared by all models
@@ -42,27 +42,24 @@ function defaultDecor() {
 
 function defaultOpts() {
   // bw: black & white rendering (default — the exams are printed and photocopied in B&W)
-  return { icons: true, closing: 'بالتوفيق والنجاح', autoModel: false, bw: true };
+  return { icons: true, closing: 'بالتوفيق والنجاح', bw: true };
 }
 
 // Template registry — order = order in the picker
 const MODELS = [
-  { id: 'C', label: 'Décoré',         gen: genExamC },
-  { id: 'D', label: 'Manuscrit',      gen: genExamD },
-  { id: 'I', label: 'Globe',          gen: genExamI },
-  { id: 'J', label: 'Carthage',       gen: genExamJ },
-  { id: 'K', label: 'Élégant',        gen: genExamK },
-  { id: 'M', label: 'Rome',           gen: genExamM },
-  { id: 'N', label: 'El Jem',         gen: genExamN },
-  { id: 'G', label: 'Fil du temps',   gen: genExamG },
-  { id: 'H', label: 'Archives',       gen: genExamH },
-  { id: 'A', label: 'Classique',      gen: genExamA },
-  { id: 'B', label: 'Moderne',        gen: genExamB },
+  { id: 'C', label: 'مزخرف',         gen: genExamC },
+  { id: 'D', label: 'مخطوطة',      gen: genExamD },
+  { id: 'I', label: 'الكرة الأرضية',          gen: genExamI },
+  { id: 'J', label: 'قرطاج',       gen: genExamJ },
+  { id: 'K', label: 'أنيق',        gen: genExamK },
+  { id: 'M', label: 'روما',           gen: genExamM },
+  { id: 'N', label: 'الجم',         gen: genExamN },
+  { id: 'G', label: 'الخط الزمني',   gen: genExamG },
+  { id: 'H', label: 'أرشيف',       gen: genExamH },
+  { id: 'A', label: 'كلاسيكي',      gen: genExamA },
+  { id: 'B', label: 'عصري',        gen: genExamB },
 ];
 const DECO_MODELS = ['C','D','G','H','I','J','K','M','N'];   // full-page decorated templates
-
-// Model chosen automatically from the subject when opts.autoModel is on
-const AUTO_MODEL = { 'التاريخ': 'J', 'الجغرافيا': 'I' };
 
 function defaultSections() {
   return [
@@ -93,18 +90,6 @@ function newQuestion(type = 'paragraph') {
 // Switch template only — sections and questions are kept
 function selectModel(model) {
   S.model = model;
-  renderAll();
-}
-
-function setSubject(subject) {
-  S.header.subject = subject;
-  if (S.opts.autoModel) S.model = AUTO_MODEL[subject] || S.model;
-  renderAll();
-}
-
-function toggleAutoModel(on) {
-  S.opts.autoModel = on;
-  if (on) S.model = AUTO_MODEL[S.header.subject] || S.model;
   renderAll();
 }
 
@@ -143,13 +128,7 @@ function buildFormBodyHTML() {
   h += `
   <div class="form-card title-card">
     <div class="form-card-body">
-      <div class="title-label">📝 Nom de l'examen <span class="hint">— automatique, pour le retrouver dans « Mes examens » (n'est pas imprimé)</span></div>
       <div id="title-preview" class="title-preview" dir="rtl">${esc(examTitle())}</div>
-      <div class="fg">
-        <label>Thème / chapitre <span class="hint">(facultatif, ajouté au nom)</span></label>
-        <input type="text" dir="auto" value="${esc(S.title || '')}" placeholder="مثال: الحرب العالمية الأولى"
-          oninput="S.title=this.value;updateTitlePreview();scheduleAutosave()">
-      </div>
     </div>
   </div>`;
   h += buildModelPickerHTML();
@@ -158,7 +137,7 @@ function buildFormBodyHTML() {
   S.sections.forEach((sec, si) => { h += buildSectionFormHTML(sec, si); });
   h += '</div>';
   h += `<div style="text-align:center;margin:12px 0 4px">
-    <button class="btn btn-primary btn-sm" onclick="addSection()">＋ Ajouter une section</button>
+    <button class="btn btn-primary btn-sm" onclick="addSection()">＋ إضافة قسم</button>
   </div>`;
   return h;
 }
@@ -179,8 +158,8 @@ function buildModelPickerHTML() {
   return `
   <details class="form-card picker-card" ${_pickerOpen ? 'open' : ''} ontoggle="_pickerOpen=this.open">
     <summary class="form-card-header">
-      <span>🎨 Style de l'examen : <b>${current}</b></span>
-      <span class="picker-hint">${_pickerOpen ? 'Fermer ▴' : 'Changer ▾'}</span>
+      <span>🎨 شكل الفرض : <b>${current}</b></span>
+      <span class="picker-hint">${_pickerOpen ? 'إغلاق ▴' : 'تغيير ▾'}</span>
     </summary>
     <div class="form-card-body">
       <div class="model-picker">${cards}</div>
@@ -188,17 +167,14 @@ function buildModelPickerHTML() {
       <div class="model-opts">
         <label class="chk chk-strong"><input type="checkbox" ${o.bw ? 'checked' : ''}
           onchange="S.opts.bw=this.checked;renderAll()">
-          ⚫ Noir et blanc — idéal pour imprimer et photocopier (décocher pour une version en couleur)</label>
-        <label class="chk"><input type="checkbox" ${o.autoModel ? 'checked' : ''}
-          onchange="toggleAutoModel(this.checked)">
-          Style automatique selon la matière (Histoire → Carthage, Géographie → Globe)</label>
+          ⚫ أبيض وأسود — مناسب للطباعة والتصوير (ألغِ التحديد للحصول على نسخة ملوّنة)</label>
         <label class="chk"><input type="checkbox" ${o.icons ? 'checked' : ''}
           onchange="S.opts.icons=this.checked;renderExam()">
-          Icône devant chaque question selon son type (plume, livre, sablier, carte, tableau)</label>
+          أيقونة أمام كل سؤال حسب نوعه (ريشة، كتاب، ساعة رملية، خريطة، جدول)</label>
         <div class="fg" style="margin-top:8px">
-          <label>Phrase de fin d'examen</label>
+          <label>عبارة نهاية الفرض</label>
           <select onchange="S.opts.closing=this.value;renderExam()">
-            ${closings.map(c => `<option value="${c}" ${sel(o.closing, c)}>${c || 'Aucune'}</option>`).join('')}
+            ${closings.map(c => `<option value="${c}" ${sel(o.closing, c)}>${c || 'بدون'}</option>`).join('')}
           </select>
         </div>
       </div>
@@ -247,20 +223,20 @@ function buildDecorFormHTML() {
   return `
   <div class="form-row" style="margin-top:10px">
     <div class="fg">
-      <label>Filigrane en bas de page</label>
+      <label>العلامة المائية أسفل الصفحة</label>
       <select onchange="S.decor.watermark=this.value;renderAll()">
-        <option value="europe"  ${sel(d.watermark,'europe' )}>Carte d'Europe + rose des vents</option>
-        <option value="compass" ${sel(d.watermark,'compass')}>Rose des vents + quadrillage</option>
-        <option value="image"   ${sel(d.watermark,'image'  )}>Image personnalisée (carte…)</option>
-        <option value="none"    ${sel(d.watermark,'none'   )}>Aucun</option>
+        <option value="europe"  ${sel(d.watermark,'europe' )}>خريطة أوروبا + وردة الرياح</option>
+        <option value="compass" ${sel(d.watermark,'compass')}>وردة الرياح + شبكة</option>
+        <option value="image"   ${sel(d.watermark,'image'  )}>صورة شخصية (خريطة…)</option>
+        <option value="none"    ${sel(d.watermark,'none'   )}>بدون</option>
       </select>
     </div>
   </div>
   ${d.watermark === 'image' ? `
   <div class="fg" style="margin-top:6px">
     <input type="file" accept="image/*" onchange="handleWatermarkImg(this)">
-    ${d.imageData ? `<div class="info-text">✓ Image chargée : ${esc(d.imageName)}</div>`
-                  : `<div class="info-text">Choisir une image (ex. carte d'Europe) — elle sera affichée en transparence.</div>`}
+    ${d.imageData ? `<div class="info-text">✓ تمّ تحميل الصورة : ${esc(d.imageName)}</div>`
+                  : `<div class="info-text">اختر صورة (مثل خريطة أوروبا) — ستظهر بشفافية.</div>`}
   </div>` : ''}`;
 }
 
@@ -280,19 +256,19 @@ function buildHeaderFormHTML() {
   const hd = S.header;
   return `
   <div class="form-card">
-    <div class="form-card-header">📋 En-tête de l'examen</div>
+    <div class="form-card-header">📋 ترويسة الفرض</div>
     <div class="form-card-body">
 
       <div class="form-row">
         <div class="fg" style="flex:0 0 96px">
-          <label>Titre professeur</label>
+          <label>الصفة</label>
           <select onchange="S.header.teacherGender=this.value;renderExam()">
             <option value="أستاذة" ${sel(hd.teacherGender,'أستاذة')}>أستاذة</option>
             <option value="أستاذ"  ${sel(hd.teacherGender,'أستاذ' )}>أستاذ</option>
           </select>
         </div>
         <div class="fg">
-          <label>Nom du professeur (arabe)</label>
+          <label>اسم الأستاذ(ة)</label>
           <input type="text" dir="rtl" id="inp-teacher" value="${esc(hd.teacherName)}"
             oninput="S.header.teacherName=this.value;renderExam()"
             placeholder="أدخل الاسم...">
@@ -301,53 +277,53 @@ function buildHeaderFormHTML() {
 
       <div class="form-row">
         <div class="fg">
-          <label>Durée</label>
+          <label>المدة</label>
           <select onchange="S.header.duration=this.value;renderExam()">
-            <option value="30" ${sel(hd.duration,'30')}>30 minutes</option>
-            <option value="60" ${sel(hd.duration,'60')}>1 heure</option>
+            <option value="30" ${sel(hd.duration,'30')}>30 دقيقة</option>
+            <option value="60" ${sel(hd.duration,'60')}>ساعة</option>
           </select>
         </div>
         <div class="fg">
-          <label>Type de devoir</label>
+          <label>نوع الفرض</label>
           <select onchange="S.header.examType=this.value;renderExam()">
-            <option value="الفرض العادي"    ${sel(hd.examType,'الفرض العادي'   )}>Devoir de contrôle</option>
-            <option value="الفرض التأليفي"  ${sel(hd.examType,'الفرض التأليفي')}>Devoir de synthèse</option>
+            <option value="الفرض العادي"    ${sel(hd.examType,'الفرض العادي'   )}>فرض عادي</option>
+            <option value="الفرض التأليفي"  ${sel(hd.examType,'الفرض التأليفي')}>فرض تأليفي</option>
           </select>
         </div>
       </div>
 
       <div class="form-row">
         <div class="fg" style="flex:0 0 80px">
-          <label>Numéro</label>
+          <label>العدد</label>
           <select onchange="S.header.examNumber=this.value;renderExam()">
             ${['1','2','3'].map(n=>`<option value="${n}" ${sel(hd.examNumber,n)}>${n}</option>`).join('')}
           </select>
         </div>
         <div class="fg">
-          <label>Matière</label>
-          <select onchange="setSubject(this.value)">
-            <option value="التاريخ"    ${sel(hd.subject,'التاريخ'   )}>Histoire</option>
-            <option value="الجغرافيا"  ${sel(hd.subject,'الجغرافيا')}>Géographie</option>
+          <label>المادة</label>
+          <select onchange="S.header.subject=this.value;renderExam()">
+            <option value="التاريخ"    ${sel(hd.subject,'التاريخ'   )}>التاريخ</option>
+            <option value="الجغرافيا"  ${sel(hd.subject,'الجغرافيا')}>الجغرافيا</option>
           </select>
         </div>
         <div class="fg">
-          <label>Niveau</label>
+          <label>المستوى</label>
           <select onchange="S.header.level=this.value;renderExam()">
-            <option value="السابعة أساسي"  ${sel(hd.level,'السابعة أساسي' )}>7ème année</option>
-            <option value="الثامنة أساسي"  ${sel(hd.level,'الثامنة أساسي' )}>8ème année</option>
-            <option value="التاسعة أساسي"  ${sel(hd.level,'التاسعة أساسي' )}>9ème année</option>
+            <option value="السابعة أساسي"  ${sel(hd.level,'السابعة أساسي' )}>السابعة أساسي</option>
+            <option value="الثامنة أساسي"  ${sel(hd.level,'الثامنة أساسي' )}>الثامنة أساسي</option>
+            <option value="التاسعة أساسي"  ${sel(hd.level,'التاسعة أساسي' )}>التاسعة أساسي</option>
           </select>
         </div>
       </div>
 
       <div class="form-row">
         <div class="fg">
-          <label>Année scolaire (début)</label>
+          <label>السنة الدراسية (البداية)</label>
           <input type="number" min="2000" max="2100" value="${hd.yearStart}"
             onchange="S.header.yearStart=parseInt(this.value)||2025;renderAll()">
         </div>
         <div class="fg">
-          <label>Année de fin (auto)</label>
+          <label>سنة النهاية (تلقائية)</label>
           <input type="number" value="${parseInt(hd.yearStart)+1}" disabled>
         </div>
       </div>
@@ -369,45 +345,45 @@ function buildSectionFormHTML(sec, si) {
     <div class="es-form-head">
       <span class="es-form-title">القسم ${name}</span>
       <div class="pts-wrap">
-        <label class="pts-label">Points :</label>
+        <label class="pts-label">النقاط :</label>
         <input type="number" min="0" max="18" step="0.5" value="${sec.points}" class="pts-input"
           onchange="updateSecPoints(${sec.id},parseFloat(this.value))">
         <span class="pts-unit">ن</span>
-        ${canDel ? `<button class="btn-icon danger" title="Supprimer cette section" onclick="removeSection(${sec.id})">✕</button>` : ''}
+        ${canDel ? `<button class="btn-icon danger" title="حذف هذا القسم" onclick="removeSection(${sec.id})">✕</button>` : ''}
       </div>
     </div>
-    ${mismatch ? `<div class="es-warn">ℹ Les points des questions font ${qTotal}ن, la section vaut ${sec.points}ن.</div>` : ''}
+    ${mismatch ? `<div class="es-warn">ℹ مجموع نقاط الأسئلة ${qTotal} ن بينما القسم يساوي ${sec.points} ن.</div>` : ''}
     <div class="es-form-body">
       ${sec.questions.map((q,qi) => buildQFormHTML(q, qi, sec.id)).join('')}
-      <button class="btn btn-ghost btn-block" onclick="addQuestion(${sec.id})">＋ Ajouter une question</button>
+      <button class="btn btn-ghost btn-block" onclick="addQuestion(${sec.id})">＋ إضافة سؤال</button>
     </div>
   </div>`;
 }
 
 function buildQFormHTML(q, qi, sid) {
   const typeOptions = [
-    ['paragraph', 'Paragraphe (فقرة)'],
-    ['definition','Définition (تعريف)'],
-    ['timeline',  'Frise chronologique (سلم زمني)'],
-    ['map',       'Carte géographique (خريطة)'],
-    ['table',     'Tableau (جدول)'],
+    ['paragraph', 'فقرة'],
+    ['definition','تعريف'],
+    ['timeline',  'سلم زمني'],
+    ['map',       'خريطة'],
+    ['table',     'جدول'],
   ].map(([v,l]) => `<option value="${v}" ${sel(q.type,v)}>${l}</option>`).join('');
 
   return `
   <div class="q-form" data-qid="${q.id}">
     <div class="q-form-head">
       <span class="q-num">${qi+1}</span>
-      <select class="q-type-select" title="Type de question" onchange="changeQType(${sid},${q.id},this.value)">
+      <select class="q-type-select" title="نوع السؤال" onchange="changeQType(${sid},${q.id},this.value)">
         ${typeOptions}
       </select>
       <input type="number" min="0" max="18" step="0.5" value="${q.points || ''}" class="pts-input" placeholder="—"
-        title="Points de la question (facultatif)" onchange="updateQ(${sid},${q.id},'points',parseFloat(this.value)||0)">
+        title="نقاط السؤال (اختياري)" onchange="updateQ(${sid},${q.id},'points',parseFloat(this.value)||0)">
       <span class="pts-unit">ن</span>
-      <button class="btn-icon danger" title="Supprimer cette question" onclick="removeQuestion(${sid},${q.id})">✕</button>
+      <button class="btn-icon danger" title="حذف هذا السؤال" onclick="removeQuestion(${sid},${q.id})">✕</button>
     </div>
 
     <div class="fg" style="margin-bottom:8px">
-      <label>Question (en arabe)</label>
+      <label>السؤال</label>
       <textarea dir="rtl" rows="2" placeholder="اكتب السؤال هنا…"
         oninput="updateQText(${sid},${q.id},this.value)"
         >${esc(q.text)}</textarea>
@@ -422,7 +398,7 @@ function buildQParamsHTML(q, sid) {
     case 'paragraph':
       return `<div class="form-row">
         <div class="fg">
-          <label>Nombre de lignes (min 10)</label>
+          <label>عدد الأسطر (10 على الأقل)</label>
           <input type="number" min="10" max="30" value="${q.params.lines||12}"
             onchange="updateQParam(${sid},${q.id},'lines',Math.max(10,parseInt(this.value)||10))">
         </div>
@@ -431,7 +407,7 @@ function buildQParamsHTML(q, sid) {
     case 'definition':
       return `<div class="form-row">
         <div class="fg">
-          <label>Nombre de lignes (min 1)</label>
+          <label>عدد الأسطر (سطر واحد على الأقل)</label>
           <input type="number" min="1" max="15" value="${q.params.lines||3}"
             onchange="updateQParam(${sid},${q.id},'lines',Math.max(1,parseInt(this.value)||1))">
         </div>
@@ -468,25 +444,25 @@ function buildTableParamsHTML(q, sid) {
   return `
   <div class="form-row">
     <div class="fg">
-      <label>Colonnes (1 – 6)</label>
+      <label>عدد الأعمدة (1 – 6)</label>
       <input type="number" min="1" max="6" value="${cols}"
         onchange="updateQParam(${sid},${q.id},'cols',Math.min(6,Math.max(1,parseInt(this.value)||3)))">
     </div>
     <div class="fg">
-      <label>Lignes (1 – 10)</label>
+      <label>عدد الصفوف (1 – 10)</label>
       <input type="number" min="1" max="10" value="${rows}"
         onchange="updateQParam(${sid},${q.id},'rows',Math.min(10,Math.max(1,parseInt(this.value)||3)))">
     </div>
     <div class="fg">
-      <label>Hauteur des cases</label>
+      <label>ارتفاع الخانات</label>
       <select onchange="updateQParam(${sid},${q.id},'cellHeight',parseInt(this.value))">
-        ${[1,2,3,4].map(n => `<option value="${n}" ${p.cellHeight == n ? 'selected' : ''}>${n} ligne${n > 1 ? 's' : ''}</option>`).join('')}
+        ${[1,2,3,4].map(n => `<option value="${n}" ${p.cellHeight == n ? 'selected' : ''}>${n} ${n > 1 ? 'أسطر' : 'سطر'}</option>`).join('')}
       </select>
     </div>
   </div>
-  <div class="sub-title">Contenu du tableau (1re ligne = titres des colonnes) :</div>
+  <div class="sub-title">محتوى الجدول (الصف الأول = عناوين الأعمدة) :</div>
   <div class="tbl-form-wrap"><table class="tbl-form" dir="rtl">${grid}</table></div>
-  <div class="info-text">Une case laissée vide sera à compléter par l'élève.</div>`;
+  <div class="info-text">الخانة التي تُترك فارغة يملؤها التلميذ.</div>`;
 }
 
 function buildTimelineParamsHTML(q, sid) {
@@ -496,7 +472,7 @@ function buildTimelineParamsHTML(q, sid) {
   for (let i = 0; i < count; i++) {
     evInputs += `<div class="form-row" style="margin-bottom:4px">
       <div class="fg">
-        <label>Événement ${i+1}</label>
+        <label>الحدث ${i+1}</label>
         <input type="text" dir="rtl"
           value="${esc(events[i]||'')}"
           oninput="updateTLEvent(${sid},${q.id},${i},this.value)"
@@ -508,28 +484,28 @@ function buildTimelineParamsHTML(q, sid) {
   return `
   <div class="form-row">
     <div class="fg">
-      <label>Nombre d'événements (2 – 8)</label>
+      <label>عدد الأحداث (2 – 8)</label>
       <input type="number" min="2" max="8" value="${count}"
         onchange="updateQParam(${sid},${q.id},'count',Math.min(8,Math.max(2,parseInt(this.value)||4)))">
     </div>
   </div>
-  <div class="sub-title">Événements à placer sur la frise :</div>
+  <div class="sub-title">الأحداث المراد وضعها على السلم الزمني :</div>
   ${evInputs}
-  <div class="info-text">L'événement 1 s'affiche à droite de la frise (sens de lecture arabe).</div>`;
+  <div class="info-text">يظهر الحدث 1 على يمين السلم الزمني (اتجاه القراءة العربية).</div>`;
 }
 
 function buildMapParamsHTML(q, sid) {
   const hasImg = !!q.params.imageData;
   return `
   <div class="fg" style="margin-bottom:6px">
-    <label>Image de la carte (PNG / JPG)</label>
+    <label>صورة الخريطة (PNG / JPG)</label>
     <input type="file" accept="image/*"
       onchange="handleMapImg(${sid},${q.id},this)">
-    ${hasImg ? `<div class="info-text">✓ Image chargée : ${esc(q.params.imageName)}</div>` : ''}
+    ${hasImg ? `<div class="info-text">✓ تمّ تحميل الصورة : ${esc(q.params.imageName)}</div>` : ''}
   </div>
   <div class="form-row">
     <div class="fg">
-      <label>Largeur de l'image</label>
+      <label>عرض الصورة</label>
       <select onchange="updateQParam(${sid},${q.id},'imageWidth',this.value)">
         <option value="50%"  ${sel(q.params.imageWidth,'50%' )}>50 %</option>
         <option value="75%"  ${sel(q.params.imageWidth,'75%' )}>75 %</option>
@@ -537,7 +513,7 @@ function buildMapParamsHTML(q, sid) {
       </select>
     </div>
     <div class="fg">
-      <label>Cases de légende (0 = aucune)</label>
+      <label>خانات مفتاح الخريطة (0 = بدون)</label>
       <input type="number" min="0" max="12" value="${q.params.legendCount||0}"
         onchange="updateQParam(${sid},${q.id},'legendCount',Math.max(0,parseInt(this.value)||0))">
     </div>
@@ -553,18 +529,18 @@ function renderFormFooter() {
   const ok  = Math.abs(tot - 18) < 0.001;
   const over = tot > 18;
   const cls = ok ? 'score-ok' : over ? 'score-error' : 'score-warn';
-  const msg = ok ? '✓ Total correct' : over ? '⚠ Dépassement — impression bloquée' : `⚠ Incomplet (manque ${+(18-tot).toFixed(1)}ن)`;
+  const msg = ok ? '✓' : over ? '⚠ تجاوز — الطباعة متوقفة' : `⚠ ناقص (ينقص ${+(18-tot).toFixed(1)} ن)`;
 
   document.getElementById('form-footer').innerHTML = `
-    <div class="score-bar ${cls}">Total : <strong>${tot}</strong> / 18 — ${msg}</div>
+    <div class="score-bar ${cls}">المجموع : <strong>${tot}</strong> / 18 ${msg}</div>
     <div id="page-warn" class="page-warn" hidden></div>
     <div class="footer-row">
-      <button class="btn btn-primary btn-lg" onclick="saveExam()"
-        title="Garder cet examen dans « Mes examens »">💾 Enregistrer</button>
-      <button class="btn btn-success btn-lg" onclick="printExam()" ${over?'disabled':''}>🖨 Imprimer</button>
+      <button class="btn btn-primary" onclick="saveExam()"
+        title="حفظ هذا الفرض في «فروضي»">💾 حفظ</button>
+      <button class="btn btn-success" onclick="printExam()" ${over?'disabled':''}>🖨 طباعة</button>
+      <button class="btn btn-share btn-pdf" data-label="📤 مشاركة PDF" onclick="sharePDF()"
+        ${over?'disabled':''} title="إنشاء ملف PDF لإرساله (واتساب، بريد…) أو الاحتفاظ به">📤 مشاركة PDF</button>
     </div>
-    <button class="btn btn-share btn-block btn-pdf" data-label="📤 Partager en PDF" onclick="sharePDF()"
-      ${over?'disabled':''} title="Créer un fichier PDF pour l'envoyer (WhatsApp, e-mail…) ou le garder">📤 Partager en PDF</button>
     <div class="footer-meta"><span id="save-status"></span></div>`;
   updateSaveStatus();
 }
@@ -724,10 +700,10 @@ function genExamA() {
 
     <div class="stu-row">
       <div class="stu-line">
-        <span class="stu-label">الإسم واللقب :</span><span class="stu-name-line"></span><span class="stu-field">القسم :&nbsp;&nbsp;..............&nbsp;&nbsp;</span><span class="stu-field">الرقم :&nbsp;..............</span>
+        <span class="stu-label">الإسم واللقب :</span><span class="stu-name-line"></span><span class="stu-field">القسم : ...........</span><span class="stu-field">الرقم : ......</span>
       </div>
       <div class="grade-block">
-        <div class="grade-box">............. / 20</div>
+        <div class="grade-box">${GRADE_TXT}</div>
         <div class="hw-box">+2 لوضوح الخط وسلامة اللغة</div>
       </div>
     </div>
@@ -777,9 +753,9 @@ function genExamB() {
 
       <div class="stu-row-b">
         <div class="stu-line-b">
-          <span class="stu-label">الإسم واللقب :</span><span class="stu-name-line"></span><span class="stu-field">القسم :&nbsp;&nbsp;..............&nbsp;&nbsp;</span><span class="stu-field">الرقم :&nbsp;..............</span>
+          <span class="stu-label">الإسم واللقب :</span><span class="stu-name-line"></span><span class="stu-field">القسم : ...........</span><span class="stu-field">الرقم : ......</span>
         </div>
-        <div class="grade-box-b">............ / 20</div>
+        <div class="grade-box-b">${GRADE_TXT}</div>
       </div>
 
       <div class="hw-note">2 ن + لوضوح الخط وسلامة اللغة</div>
@@ -833,6 +809,8 @@ function genExamC() {
       </div>
 
       <div class="c-sep"><span></span><i>◆</i><b>◆</b><i>◆</i><span></span></div>
+
+      <div class="c-stu">${studentLineHTML()}<span class="c-grade">${GRADE_TXT}</span></div>
 
       ${body}
       ${closingHTML()}
@@ -1002,7 +980,7 @@ function genExamD() {
 
       <div class="d-stu-row">
         ${studentLineHTML()}
-        <div class="d-seal"><span>العدد</span><b>...... / 20</b></div>
+        <div class="d-seal"><span>العدد :</span><b>........ / 20</b></div>
       </div>
       <div class="hw-note-gen">${HW_NOTE}</div>
 
@@ -1046,7 +1024,7 @@ function genExamG() {
 
       <div class="g-stu-row">
         ${studentLineHTML()}
-        <div class="g-grade">...... / 20</div>
+        <div class="g-grade">${GRADE_TXT}</div>
       </div>
       <div class="hw-note-gen">${HW_NOTE}</div>
 
@@ -1110,7 +1088,7 @@ function genExamH() {
 
       <div class="h-stu-row">
         ${studentLineHTML()}
-        <div class="h-grade-stamp"><span>العدد</span><b>...... / 20</b></div>
+        <div class="h-grade-stamp"><span>العدد :</span><b>........ / 20</b></div>
       </div>
       <div class="hw-note-gen">${HW_NOTE}</div>
 
@@ -1137,10 +1115,13 @@ function framedHeaderHTML(titleHTML) {
     <div class="fh-bottom">
       <span>الإسم واللقب :</span><span class="stu-gen-line"></span>
       <span>القسم : ...........</span><span>الرقم : ......</span>
-      <span class="fh-grade">العدد : ........ / 20</span>
+      <span class="fh-grade">${GRADE_TXT}</span>
     </div>
   </div>`;
 }
+
+// Exact wording of the grade box, identical in every template
+const GRADE_TXT = 'العدد : ........ / 20';
 
 // Small "globe" icon (meridians + parallels), used as bullet / ornament
 function miniGlobeSVG(cls) {
@@ -1559,7 +1540,7 @@ function renderMap(params) {
 
 function printExam() {
   if (totalPoints() > 18) {
-    alert('Impossible d\'imprimer : le total des sections dépasse 18 points.');
+    alert('لا يمكن الطباعة: مجموع نقاط الأقسام يتجاوز 18.');
     return;
   }
   if (isTouchDevice()) { sharePDF(); return; }
@@ -1581,7 +1562,7 @@ function applyState(loaded) {
   if (!MODELS.some(m => m.id === S.model)) S.model = 'C';
   S.decor = { ...defaultDecor(), ...(S.decor || {}) };
   S.opts  = { ...defaultOpts(),  ...(S.opts  || {}) };
-  if (typeof S.title !== 'string') S.title = '';
+  if (S.seq === undefined) S.seq = null;
   if (S.docId === undefined) S.docId = null;
   const allIds = [0, ...S.sections.flatMap(s => [s.id, ...s.questions.map(q => q.id)])];
   _nextId = Math.max(...allIds) + 1;
@@ -1633,20 +1614,42 @@ const kvSet = (k, v)  => dbReq('kv',    'readwrite', s => s.put(v, k));
 const newDocId = () => 'ex' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
 
 // ── names shown in the library ──
-const SUBJ_FR  = { 'التاريخ': 'Histoire', 'الجغرافيا': 'Géographie' };
-const LEVEL_FR = { 'السابعة أساسي': '7e année', 'الثامنة أساسي': '8e année', 'التاسعة أساسي': '9e année' };
-const TYPE_FR  = { 'الفرض العادي': 'Devoir de contrôle', 'الفرض التأليفي': 'Devoir de synthèse' };
 
-// Exam name is built from the header (always up to date) + the optional theme typed by the teacher
-function autoTitle(st = S) {
-  const h = st.header;
-  const y = parseInt(h.yearStart);
-  return `${h.examType} عدد ${h.examNumber} – ${h.subject} – ${h.level} – ${y}/${y + 1}`;
+// Exam name = built from the header (always up to date); when an exam with the same name is already
+// stored, a number is inserted before the school year:  … – التاسعة أساسي – 1 – 2026/2027
+function nameParts(st) {
+  const h = st.header, y = parseInt(h.yearStart);
+  return { head: `${h.examType} عدد ${h.examNumber} – ${h.subject} – ${h.level}`, year: `${y}/${y + 1}` };
 }
-function examTitle(st = S) {
-  const theme = (st.title || '').trim();
-  return theme ? `${autoTitle(st)} – ${theme}` : autoTitle(st);
+function titleFor(st, seq) {
+  const { head, year } = nameParts(st);
+  return seq > 0 ? `${head} – ${seq} – ${year}` : `${head} – ${year}`;
 }
+function nameKey(st) { const p = nameParts(st); return p.head + '|' + p.year; }
+
+let _names = [];   // { id, key, seq } of every stored exam (refreshed after each change in the library)
+async function loadNames() {
+  try { _names = (await dbAll()).map(r => ({ id: r.id, key: nameKey(r.data), seq: r.seq || 0 })); }
+  catch { _names = []; }
+}
+
+// 0 = no number; otherwise the number making the name unique among the OTHER stored exams.
+// An already assigned number is kept as long as it stays free (names do not change by themselves).
+function computeSeq(st) {
+  const key = nameKey(st);
+  const used = new Set(_names.filter(n => n.key === key && n.id !== st.docId).map(n => n.seq));
+  if (!used.size) return 0;
+  if (st.seq != null && !used.has(st.seq)) return st.seq;
+  let n = 0;
+  while (used.has(n)) n++;
+  return n;
+}
+
+// Isolates an Arabic name inside a French sentence (keeps the right reading order)
+function iso(t) { return '⁨' + t + '⁩'; }
+
+function autoTitle(st = S) { return titleFor(st, 0); }
+function examTitle(st = S) { return titleFor(st, computeSeq(st)); }
 function updateTitlePreview() {
   const el = document.getElementById('title-preview');
   if (el) el.textContent = examTitle();
@@ -1655,7 +1658,7 @@ function updateTitlePreview() {
 function makeRecord(data, createdAt, updatedAt) {
   const h = data.header;
   return {
-    id: data.docId, title: examTitle(data),
+    id: data.docId, title: titleFor(data, data.seq || 0), seq: data.seq || 0,
     subject: h.subject, level: h.level, examType: h.examType, examNumber: h.examNumber,
     model: data.model, createdAt, updatedAt, data,
   };
@@ -1668,7 +1671,7 @@ let _savedAt = null;
 let _dirty = false;      // differences with the library version
 
 function hasContent(st = S) {
-  return !!(st.title || '').trim() || st.sections.some(s => s.questions.length > 0);
+  return st.sections.some(s => s.questions.length > 0);
 }
 
 function scheduleAutosave() {
@@ -1712,13 +1715,13 @@ function updateSaveStatus() {
   const hm = d => d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
   if (_draftFailed) {
     el.className = 'save-err';
-    el.textContent = '⚠ Le navigateur ne peut plus rien garder (espace plein).';
+    el.textContent = '⚠ لم يعد المتصفح قادرًا على الحفظ (المساحة ممتلئة).';
   } else if (_dirty) {
     el.className = 'save-dirty';
-    el.textContent = S.docId ? '● Modifications non enregistrées' : '● Examen pas encore enregistré';
+    el.textContent = S.docId ? '● تعديلات غير محفوظة' : '● الفرض لم يُحفظ بعد';
   } else if (S.docId) {
     el.className = 'save-ok';
-    el.textContent = `✓ Enregistré dans « Mes examens »${_savedAt ? ' à ' + hm(_savedAt) : ''}`;
+    el.textContent = `✓ تمّ الحفظ في «فروضي»${_savedAt ? ' على الساعة ' + hm(_savedAt) : ''}`;
   } else {
     el.className = '';
     el.textContent = '';
@@ -1731,17 +1734,20 @@ window.addEventListener('beforeunload', () => { if (_saveTimer) autosave(); });
 async function saveExam() {
   try {
     if (!S.docId) S.docId = newDocId();
+    await loadNames();
+    S.seq = computeSeq(S);
     const now = Date.now();
     const old = await dbGet(S.docId);
     await dbPut(makeRecord(clone(S), old ? old.createdAt : now, now));
     _savedJson = JSON.stringify(S);
     _savedAt = new Date(now);
+    await loadNames();
     if (navigator.storage && navigator.storage.persist) navigator.storage.persist();
     await autosave();
-    toast(`✓ « ${examTitle()} » est enregistré dans Mes examens`);
+    toast(`✓ تمّ حفظ «${iso(examTitle())}» في فروضي`);
     return true;
   } catch (err) {
-    alert("L'examen n'a pas pu être enregistré.\n\n(" + (err && err.message) + ')');
+    alert("تعذّر حفظ الفرض.\n\n(" + (err && err.message) + ')');
     return false;
   }
 }
@@ -1751,12 +1757,12 @@ async function confirmLeave() {
   if (_saveTimer) await autosave();
   if (!_dirty) return true;
   const choice = await askDialog({
-    title: 'Modifications non enregistrées',
-    text: `L'examen « ${examTitle()} » contient des modifications qui ne sont pas encore enregistrées.`,
+    title: 'تعديلات غير محفوظة',
+    text: `الفرض «${iso(examTitle())}» يحتوي على تعديلات لم تُحفظ بعد.`,
     buttons: [
-      { label: 'Annuler', value: 'cancel', cls: 'btn-ghost' },
-      { label: 'Ne pas enregistrer', value: 'discard', cls: 'btn-secondary' },
-      { label: '💾 Enregistrer', value: 'save', cls: 'btn-primary' },
+      { label: 'إلغاء', value: 'cancel', cls: 'btn-ghost' },
+      { label: 'عدم الحفظ', value: 'discard', cls: 'btn-secondary' },
+      { label: '💾 حفظ', value: 'save', cls: 'btn-primary' },
     ],
   });
   if (choice === 'save') return await saveExam();
@@ -1767,11 +1773,11 @@ async function newExam() {
   if (!await confirmLeave()) return;
   S = {
     model: S.model, header: { ...S.header }, sections: defaultSections(),
-    decor: S.decor, opts: S.opts, title: '', docId: null,
+    decor: S.decor, opts: S.opts, seq: null, docId: null,
   };
   _savedJson = null; _savedAt = null; _dirty = false;
   renderAll();
-  toast('Nouvel examen : l\'en-tête a été gardé, les questions sont vides.');
+  toast('فرض جديد: تمّ الاحتفاظ بالترويسة والأسئلة فارغة.');
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1785,7 +1791,7 @@ async function openLibrary() {
   try {
     _libItems = (await dbAll()).sort((a, b) => b.updatedAt - a.updatedAt);
   } catch (err) {
-    alert('Impossible de lire « Mes examens » dans ce navigateur.\n\n(' + (err && err.message) + ')');
+    alert('تعذّرت قراءة «فروضي» في هذا المتصفح.\n\n(' + (err && err.message) + ')');
     return;
   }
   document.getElementById('library').hidden = false;
@@ -1801,10 +1807,9 @@ async function refreshLibrary() {
 
 function renderLibraryList() {
   const q = (document.getElementById('lib-search').value || '').trim().toLowerCase();
-  const fmt = t => new Date(t).toLocaleString('fr-FR',
+  const fmt = t => new Date(t).toLocaleString('ar-TN-u-nu-latn',
     { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' });
-  const label = r => [SUBJ_FR[r.subject] || r.subject, LEVEL_FR[r.level] || r.level,
-    `${TYPE_FR[r.examType] || r.examType} n°${r.examNumber}`,
+  const label = r => [r.subject, r.level, `${r.examType} عدد ${r.examNumber}`,
     (MODELS.find(m => m.id === r.model) || {}).label].filter(Boolean).join(' · ');
 
   const items = _libItems.filter(r =>
@@ -1812,12 +1817,12 @@ function renderLibraryList() {
 
   const list = document.getElementById('lib-list');
   if (!_libItems.length) {
-    list.innerHTML = `<div class="lib-empty">Aucun examen enregistré pour l'instant.<br>
-      Cliquez sur <b>💾 Enregistrer</b> en bas du formulaire pour garder l'examen en cours ici.</div>`;
+    list.innerHTML = `<div class="lib-empty">لا يوجد أي فرض محفوظ حاليًا.<br>
+      اضغط على <b>💾 حفظ</b> أسفل النموذج للاحتفاظ بالفرض الحالي هنا.</div>`;
     return;
   }
   if (!items.length) {
-    list.innerHTML = `<div class="lib-empty">Aucun examen ne correspond à « ${esc(q)} ».</div>`;
+    list.innerHTML = `<div class="lib-empty">لا يوجد فرض مطابق لـ «${esc(q)}».</div>`;
     return;
   }
   list.innerHTML = items.map(r => {
@@ -1826,16 +1831,16 @@ function renderLibraryList() {
       <div class="lib-icon">${r.subject === 'الجغرافيا' ? '🌍' : '📜'}</div>
       <div class="lib-main">
         <div class="lib-title" dir="auto">${esc(r.title)}</div>
-        <div class="lib-sub">${esc(label(r))}${current ? ' <span class="lib-badge">ouvert</span>' : ''}</div>
-        <div class="lib-date">Modifié le ${fmt(r.updatedAt)}</div>
+        <div class="lib-sub">${esc(label(r))}${current ? ' <span class="lib-badge">مفتوح</span>' : ''}</div>
+        <div class="lib-date">آخر تعديل : ${fmt(r.updatedAt)}</div>
       </div>
       <div class="lib-actions">
-        <button class="btn btn-primary btn-sm" onclick="openFromLibrary('${r.id}')">📂 Ouvrir</button>
+        <button class="btn btn-primary btn-sm" onclick="openFromLibrary('${r.id}')">📂 فتح</button>
         <button class="btn btn-ghost btn-sm" onclick="duplicateExam('${r.id}')"
-          title="Faire une copie (pour une autre classe, l'année prochaine…)">⧉ Dupliquer</button>
-        <button class="btn-icon" title="Télécharger ce fichier (pour l'envoyer ou le garder)"
+          title="إنشاء نسخة (لقسم آخر أو للسنة القادمة…)">⧉ نسخ</button>
+        <button class="btn-icon" title="تنزيل ملف الفرض (لإرساله أو الاحتفاظ به)"
           onclick="downloadExam('${r.id}')">⬇</button>
-        <button class="btn-icon danger" title="Supprimer" onclick="deleteExam('${r.id}')">🗑</button>
+        <button class="btn-icon danger" title="حذف" onclick="deleteExam('${r.id}')">🗑</button>
       </div>
     </div>`;
   }).join('');
@@ -1853,7 +1858,7 @@ async function openFromLibrary(id) {
   _dirty = false;
   closeLibrary();
   renderAll();
-  toast(`Examen ouvert : « ${examTitle()} »`);
+  toast(`تمّ فتح الفرض : «${iso(examTitle())}»`);
 }
 
 async function duplicateExam(id) {
@@ -1861,32 +1866,36 @@ async function duplicateExam(id) {
   if (!rec) return;
   const data = clone(rec.data);
   data.docId = newDocId();
-  data.title = ((rec.data.title || '').trim() + ' (copie)').trim();
+  data.seq = null;
+  await loadNames();
+  data.seq = computeSeq(data);
   const now = Date.now();
   await dbPut(makeRecord(data, now, now));
+  await loadNames();
   await refreshLibrary();
-  toast('Copie créée : « ' + examTitle(data) + ' »');
+  toast('تمّ إنشاء نسخة : «' + iso(examTitle(data)) + '»');
 }
 
 async function deleteExam(id) {
   const rec = await dbGet(id);
   if (!rec) return;
   const choice = await askDialog({
-    title: 'Supprimer cet examen ?',
-    text: `« ${rec.title} » sera supprimé définitivement de Mes examens.`,
+    title: 'حذف هذا الفرض؟',
+    text: `«${iso(rec.title)}» سيُحذف نهائيًا من فروضي.`,
     buttons: [
-      { label: 'Annuler', value: 'cancel', cls: 'btn-ghost' },
-      { label: '🗑 Supprimer', value: 'delete', cls: 'btn-danger' },
+      { label: 'إلغاء', value: 'cancel', cls: 'btn-ghost' },
+      { label: '🗑 حذف', value: 'delete', cls: 'btn-danger' },
     ],
   });
   if (choice !== 'delete') return;
   await dbDel(id);
+  await loadNames();
   if (id === S.docId) {           // the open exam stays on screen, as a not-yet-saved exam
     S.docId = null; _savedJson = null; _savedAt = null;
     await autosave();
   }
   await refreshLibrary();
-  toast('Examen supprimé.');
+  toast('تمّ حذف الفرض.');
 }
 
 // ── files: one exam, or a backup of the whole library ──
@@ -1906,11 +1915,11 @@ async function downloadExam(id) {
 
 async function exportAll() {
   const exams = await dbAll();
-  if (!exams.length) { toast('Aucun examen à sauvegarder.'); return; }
+  if (!exams.length) { toast('لا توجد فروض للنسخ الاحتياطي.'); return; }
   const day = new Date().toISOString().slice(0, 10);
   downloadJSON({ type: 'examgen-backup', version: 1, exportedAt: Date.now(), exams },
-    `Sauvegarde Mes examens ${day}.json`);
-  toast(`${exams.length} examen(s) sauvegardé(s) dans le dossier Téléchargements.`);
+    `نسخة احتياطية - فروضي ${day}.json`);
+  toast(`تمّ حفظ ${exams.length} فرض في مجلد التنزيلات.`);
 }
 
 function importFile(event) {
@@ -1934,15 +1943,19 @@ function importFile(event) {
       } else if (obj && obj.header && Array.isArray(obj.sections)) {   // a single exam
         const data = clone(obj);
         data.docId = newDocId();
+        data.seq = null;
+        await loadNames();
+        data.seq = computeSeq(data);
         await dbPut(makeRecord(data, now, now));
         n = 1;
       } else {
         throw new Error('format inconnu');
       }
+      await loadNames();
       await refreshLibrary();
-      toast(n ? `${n} examen(s) ajouté(s) à Mes examens.` : 'Aucun examen trouvé dans ce fichier.');
+      toast(n ? `تمّت إضافة ${n} فرض إلى فروضي.` : 'لم يُعثر على أي فرض في هذا الملف.');
     } catch (err) {
-      alert("Ce fichier n'a pas pu être importé. Choisissez un fichier d'examen (.json).\n\n(" + err.message + ')');
+      alert("تعذّر استيراد هذا الملف. اختر ملف فرض (.json).\n\n(" + err.message + ')');
     }
   };
   reader.readAsText(file);
@@ -2033,7 +2046,7 @@ async function makePdfBlob() {
 async function sharePDF() {
   if (_pdfBusy) return;
   if (totalPoints() > 18) {
-    alert('Impossible de créer le PDF : le total des sections dépasse 18 points.');
+    alert('لا يمكن إنشاء ملف PDF: مجموع نقاط الأقسام يتجاوز 18.');
     return;
   }
   _pdfBusy = true;
@@ -2041,19 +2054,43 @@ async function sharePDF() {
   try {
     const blob = await makePdfBlob();
     _pdfFile = new File([blob], safeName(examTitle()) + '.pdf', { type: 'application/pdf' });
-    showPdfReady();
   } catch (err) {
-    alert("Le PDF n'a pas pu être créé. Vérifiez la connexion Internet puis réessayez.\n\n(" + (err && err.message) + ')');
+    alert("تعذّر إنشاء ملف PDF. تحقّق من اتصال الإنترنت ثم أعد المحاولة.\n\n(" + (err && err.message) + ')');
+    return;
   } finally {
     _pdfBusy = false;
     setPdfButtons(false);
   }
+
+  // Share right away (phone share menu: WhatsApp, e-mail…). Phones only allow it shortly after
+  // the tap; if the moment has passed or it is refused, ask for one more tap in the « PDF prêt » window.
+  if (canShareFile(_pdfFile)) {
+    const tapStillValid = !navigator.userActivation || navigator.userActivation.isActive;
+    if (tapStillValid) {
+      try {
+        await navigator.share({ files: [_pdfFile], title: examTitle() });
+        return;
+      } catch (err) {
+        if (err && err.name === 'AbortError') return;      // the user closed the share menu
+      }
+    }
+    showPdfReady();
+    return;
+  }
+  downloadPdf();                                          // computer without share menu: save the file
 }
+
+// Load the PDF tools in the background once the page is idle, so the first tap is quick
+window.addEventListener('load', () => {
+  const warm = () => loadPdfLibs().catch(() => {});
+  if ('requestIdleCallback' in window) requestIdleCallback(warm, { timeout: 5000 });
+  else setTimeout(warm, 3000);
+});
 
 function setPdfButtons(busy) {
   document.querySelectorAll('.btn-pdf').forEach(b => {
     b.disabled = busy;
-    b.textContent = busy ? '⏳ Préparation du PDF…' : b.dataset.label;
+    b.textContent = busy ? '⏳ جارٍ التحضير…' : b.dataset.label;
   });
 }
 
@@ -2064,7 +2101,7 @@ function canShareFile(file) {
 // Second step with a fresh tap: phones only allow the share menu right after a user gesture
 function showPdfReady() {
   const kb = Math.max(1, Math.round(_pdfFile.size / 1024));
-  document.getElementById('pdf-name').textContent = `${_pdfFile.name} (${kb < 1024 ? kb + ' Ko' : (kb / 1024).toFixed(1) + ' Mo'})`;
+  document.getElementById('pdf-name').textContent = `${_pdfFile.name} (${kb < 1024 ? kb + ' KB' : (kb / 1024).toFixed(1) + ' MB'})`;
   document.getElementById('pdf-share').hidden = !canShareFile(_pdfFile);
   document.getElementById('pdf-ready').hidden = false;
 }
@@ -2086,7 +2123,7 @@ function downloadPdf() {
   Object.assign(document.createElement('a'), { href: url, download: _pdfFile.name }).click();
   setTimeout(() => URL.revokeObjectURL(url), 60000);
   closePdfReady();
-  toast('📄 PDF enregistré (dossier Téléchargements).');
+  toast('📄 تمّ حفظ ملف PDF (مجلد التنزيلات).');
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -2184,21 +2221,42 @@ function examContentHeight(el) {
   return bottom + parseFloat(getComputedStyle(el).paddingBottom || 0);
 }
 
+// Is the exam longer than one A4 page? Measured on an off-screen copy at the real page width,
+// so the answer is right even when the preview is hidden (phone: « Formulaire » tab) or zoomed out.
+function examIsTooLong() {
+  const src = document.getElementById('exam-a4');
+  const holder = document.createElement('div');
+  holder.style.cssText = 'position:fixed;left:-10000px;top:0;width:210mm;visibility:hidden;pointer-events:none;';
+  const page = document.createElement('div');
+  page.className = src.className;
+  page.setAttribute('dir', 'rtl');
+  page.setAttribute('lang', 'ar');
+  page.innerHTML = src.innerHTML;
+  page.querySelectorAll('.page-guide').forEach(n => n.remove());
+  page.style.zoom = '1';
+  holder.appendChild(page);
+  document.body.appendChild(holder);
+  try {
+    return examContentHeight(page) > page.offsetWidth * 297 / 210 + 2;
+  } finally {
+    holder.remove();
+  }
+}
+
 function checkPageOverflow() {
   const el = document.getElementById('exam-a4');
   if (!el) return;
   el.querySelector('.page-guide')?.remove();
-  const pageH = el.offsetWidth * 297 / 210;
-  const over = examContentHeight(el) > pageH + 2;
+  const over = examIsTooLong();
   if (over) {
     el.insertAdjacentHTML('beforeend',
-      '<div class="page-guide"><span>Fin de la page 1 — la suite sera imprimée sur une 2e page</span></div>');
+      '<div class="page-guide"><span>نهاية الصفحة 1 — الباقي سيُطبع في صفحة ثانية</span></div>');
   }
   const warn = document.getElementById('page-warn');
   if (warn) {
     warn.hidden = !over;
     warn.textContent = over
-      ? "⚠ L'examen dépasse une page (ligne rouge dans l'aperçu) : réduisez le nombre de lignes."
+      ? "⚠ الفرض يتجاوز صفحة واحدة (الخط الأحمر في المعاينة) : قلّل عدد الأسطر."
       : '';
   }
 }
@@ -2211,17 +2269,17 @@ function scalePreview() {
   // Reset any previously applied scaling
   exam.style.zoom = '';
 
-  if (window.innerWidth >= 860) return;   // desktop — no scaling needed
-
-  // 210 mm = 794 px at the CSS reference pixel (96 dpi)
+  // The form takes most of the width: shrink the A4 page to fit the space left for the preview
+  // (210 mm = 794 px at the CSS reference pixel, 96 dpi). Printing is never affected (zoom reset in @media print).
   const A4_W  = 794;
-  const pad   = 24;                       // preview-panel horizontal padding
-  const avail = panel.clientWidth - pad;
-  const scale = avail / A4_W;
+  const cs    = getComputedStyle(panel);
+  const pad   = parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight);
+  if (!panel.clientWidth) return;         // preview hidden (phone, « Formulaire » tab): scaled when it is shown
+  const scale = (panel.clientWidth - pad) / A4_W;
 
   if (scale >= 1) return;                 // container already wider than A4
 
-  exam.style.zoom = scale;               // zoom affects layout → auto-centering works
+  exam.style.zoom = Math.max(scale, 0.3); // zoom affects layout → auto-centering works
 }
 
 window.addEventListener('resize', scalePreview);
@@ -2232,5 +2290,5 @@ window.addEventListener('resize', scalePreview);
 
 S.sections = defaultSections();
 renderAll();
-restoreDraft().then(ok => { if (ok) renderAll(); });
+loadNames().then(restoreDraft).then(ok => { if (ok) renderAll(); else updateTitlePreview(); });
 
