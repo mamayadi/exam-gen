@@ -41,23 +41,28 @@ function defaultDecor() {
 }
 
 function defaultOpts() {
-  return { icons: true, closing: 'بالتوفيق والنجاح', autoModel: false };
+  // bw: black & white rendering (default — the exams are printed and photocopied in B&W)
+  return { icons: true, closing: 'بالتوفيق والنجاح', autoModel: false, bw: true };
 }
 
 // Template registry — order = order in the picker
 const MODELS = [
   { id: 'C', label: 'Décoré',         gen: genExamC },
   { id: 'D', label: 'Manuscrit',      gen: genExamD },
-  { id: 'E', label: 'Carte ancienne', gen: genExamE },
+  { id: 'I', label: 'Globe',          gen: genExamI },
+  { id: 'J', label: 'Carthage',       gen: genExamJ },
+  { id: 'K', label: 'Élégant',        gen: genExamK },
+  { id: 'M', label: 'Rome',           gen: genExamM },
+  { id: 'N', label: 'El Jem',         gen: genExamN },
   { id: 'G', label: 'Fil du temps',   gen: genExamG },
   { id: 'H', label: 'Archives',       gen: genExamH },
   { id: 'A', label: 'Classique',      gen: genExamA },
   { id: 'B', label: 'Moderne',        gen: genExamB },
 ];
-const DECO_MODELS = ['C','D','E','G','H'];   // full-page decorated templates
+const DECO_MODELS = ['C','D','G','H','I','J','K','M','N'];   // full-page decorated templates
 
 // Model chosen automatically from the subject when opts.autoModel is on
-const AUTO_MODEL = { 'التاريخ': 'D', 'الجغرافيا': 'E' };
+const AUTO_MODEL = { 'التاريخ': 'J', 'الجغرافيا': 'I' };
 
 function defaultSections() {
   return [
@@ -181,9 +186,12 @@ function buildModelPickerHTML() {
       <div class="model-picker">${cards}</div>
       ${S.model === 'C' ? buildDecorFormHTML() : ''}
       <div class="model-opts">
+        <label class="chk chk-strong"><input type="checkbox" ${o.bw ? 'checked' : ''}
+          onchange="S.opts.bw=this.checked;renderAll()">
+          ⚫ Noir et blanc — idéal pour imprimer et photocopier (décocher pour une version en couleur)</label>
         <label class="chk"><input type="checkbox" ${o.autoModel ? 'checked' : ''}
           onchange="toggleAutoModel(this.checked)">
-          Style automatique selon la matière (Histoire → Manuscrit, Géographie → Carte ancienne)</label>
+          Style automatique selon la matière (Histoire → Carthage, Géographie → Globe)</label>
         <label class="chk"><input type="checkbox" ${o.icons ? 'checked' : ''}
           onchange="S.opts.icons=this.checked;renderExam()">
           Icône devant chaque question selon son type (plume, livre, sablier, carte, tableau)</label>
@@ -202,15 +210,16 @@ function buildModelPickerHTML() {
 let _pickerOpen = false;
 
 // Picker thumbnails = real renders of a sample exam, scaled down (built once)
-let _thumbs = null;
+const _thumbs = {};
 function getModelThumbs() {
-  if (_thumbs) return _thumbs;
+  const mode = S.opts.bw ? 'bw' : 'color';
+  if (_thumbs[mode]) return _thumbs[mode];
   const saved = S;
   S = {
     model: 'C',
     header: { ...saved.header, teacherName: '', subject: 'التاريخ' },
     decor: defaultDecor(),
-    opts: defaultOpts(),
+    opts: { ...defaultOpts(), bw: saved.opts.bw },
     sections: [
       { id: -1, points: 6, questions: [
         { id: -2, type: 'timeline', text: 'ضع على السلم الزمني تواريخ هذه الأحداث:', points: 0,
@@ -221,16 +230,16 @@ function getModelThumbs() {
           params: { lines: 12 } } ] },
     ],
   };
-  _thumbs = {};
+  const thumbs = {};
   try {
     MODELS.forEach(m => {
       S.model = m.id;
-      _thumbs[m.id] = `<div class="${examClass(m.id)}" dir="rtl" lang="ar">${m.gen()}</div>`;
+      thumbs[m.id] = `<div class="${examClass(m.id)}" dir="rtl" lang="ar">${m.gen()}</div>`;
     });
   } finally {
     S = saved;
   }
-  return _thumbs;
+  return (_thumbs[mode] = thumbs);
 }
 
 function buildDecorFormHTML() {
@@ -552,8 +561,10 @@ function renderFormFooter() {
     <div class="footer-row">
       <button class="btn btn-primary btn-lg" onclick="saveExam()"
         title="Garder cet examen dans « Mes examens »">💾 Enregistrer</button>
-      <button class="btn btn-success btn-lg" onclick="printExam()" ${over?'disabled':''}>🖨 Imprimer / PDF</button>
+      <button class="btn btn-success btn-lg" onclick="printExam()" ${over?'disabled':''}>🖨 Imprimer</button>
     </div>
+    <button class="btn btn-share btn-block btn-pdf" data-label="📤 Partager en PDF" onclick="sharePDF()"
+      ${over?'disabled':''} title="Créer un fichier PDF pour l'envoyer (WhatsApp, e-mail…) ou le garder">📤 Partager en PDF</button>
     <div class="footer-meta"><span id="save-status"></span></div>`;
   updateSaveStatus();
 }
@@ -672,7 +683,7 @@ function renderExam() {
 }
 
 function examClass(id) {
-  return `exam-a4 model-${id.toLowerCase()}${DECO_MODELS.includes(id) ? ' deco' : ''}`;
+  return `exam-a4 model-${id.toLowerCase()}${DECO_MODELS.includes(id) ? ' deco' : ''}${S.opts.bw ? ' bw' : ''}`;
 }
 
 /* ── MODEL A ── */
@@ -1000,75 +1011,6 @@ function genExamD() {
     </div>`;
 }
 
-/* ── MODEL E — CARTE ANCIENNE ── */
-function genExamE() {
-  const hd = S.header;
-  let body = '';
-  S.sections.forEach((sec, si) => {
-    body += `<div class="e-sec">
-      <span class="e-sec-title">القسم ${ordName(si)}</span>
-      <span class="e-route"></span>
-      <span class="e-pin"><b>${sec.points} ن</b></span>
-    </div>`;
-    const single = sec.questions.length === 1;
-    sec.questions.forEach((q, qi) => {
-      body += `<div class="q-box e-q">
-        <div class="q-text">${qTitleHTML(q, single ? '' : `${qi+1}- `)}</div>
-        ${renderQContent(q)}
-      </div>`;
-    });
-  });
-
-  const lon = ['0°','10°','20°','30°','40°','50°','60°'].map(d => `<span>${d}</span>`).join('');
-  const lat = ['60°','50°','40°','30°'].map(d => `<span>${d}</span>`).join('');
-  const star = `<svg class="e-star" viewBox="-12 -12 24 24" xmlns="http://www.w3.org/2000/svg" fill="#333">
-    <path d="M0-11L2.5-2.5 11 0 2.5 2.5 0 11-2.5 2.5-11 0-2.5-2.5Z"/></svg>`;
-
-  return `
-    <div class="e-frame"></div>
-    <div class="e-deg e-deg-top">${lon}</div>
-    <div class="e-deg e-deg-bottom">${lon}</div>
-    <div class="e-deg e-deg-side e-deg-right">${lat}</div>
-    <div class="e-deg e-deg-side e-deg-left">${lat}</div>
-
-    <div class="deco-content">
-      <div class="e-hdr">
-        <div class="e-hdr-side">
-          <b>${esc(hd.teacherGender)}:</b> ${esc(hd.teacherName)}<br>
-          <b>المدة:</b> ${durText()}
-        </div>
-        <div class="cartouche e-cartouche">
-          ${cartoucheSVG('#fff', '#333')}
-          <div class="cartouche-text">${examTitleHTML()}</div>
-        </div>
-        <div class="e-hdr-side">
-          <b>المستوى:</b> ${esc(hd.level)}<br>
-          <b>السنة الدراسية:</b> ${yearText()}
-        </div>
-      </div>
-
-      ${ornSep(star)}
-
-      <div class="e-stu-row">
-        ${studentLineHTML()}
-        <div class="e-grade"><span>العدد</span><b>...... / 20</b></div>
-      </div>
-      <div class="hw-note-gen">${HW_NOTE}</div>
-
-      ${body}
-      ${closingHTML()}
-    </div>
-
-    <div class="e-footer">
-      <div class="e-scale">
-        <div class="e-scale-title">مقياس الرسم</div>
-        <div class="e-scale-bar"><i></i><i></i><i></i><i></i></div>
-        <div class="e-scale-lbl"><span>0</span><span>200</span><span>400</span><span>600</span><span>800 كم</span></div>
-      </div>
-      ${compassSVG('e-compass', '#333')}
-    </div>`;
-}
-
 /* ── MODEL G — FIL DU TEMPS ── */
 const ROMAN = ['I','II','III','IV','V','VI','VII','VIII','IX','X'];
 
@@ -1172,6 +1114,294 @@ function genExamH() {
       </div>
       <div class="hw-note-gen">${HW_NOTE}</div>
 
+      ${body}
+      ${closingHTML()}
+    </div>`;
+}
+
+/* ── FRAMED HEADER (Globe, Carthage): teacher | title | level, then the student line — all in one frame ── */
+function framedHeaderHTML(titleHTML) {
+  const hd = S.header;
+  return `<div class="fh">
+    <div class="fh-top">
+      <div class="fh-side">
+        <div><b>${esc(hd.teacherGender)}:</b> ${esc(hd.teacherName)}</div>
+        <div><b>المدة:</b> ${durText()}</div>
+      </div>
+      <div class="fh-title">${titleHTML}</div>
+      <div class="fh-side">
+        <div><b>المستوى:</b> ${esc(hd.level)}</div>
+        <div><b>السنة الدراسية:</b> ${yearText()}</div>
+      </div>
+    </div>
+    <div class="fh-bottom">
+      <span>الإسم واللقب :</span><span class="stu-gen-line"></span>
+      <span>القسم : ...........</span><span>الرقم : ......</span>
+      <span class="fh-grade">العدد : ........ / 20</span>
+    </div>
+  </div>`;
+}
+
+// Small "globe" icon (meridians + parallels), used as bullet / ornament
+function miniGlobeSVG(cls) {
+  return `<svg class="${cls}" viewBox="-12 -12 24 24" xmlns="http://www.w3.org/2000/svg"
+      fill="none" stroke="currentColor" stroke-width="1.2">
+    <circle r="10.5"/><ellipse rx="4.5" ry="10.5"/><path d="M0-10.5V10.5M-10.5 0H10.5M-9 -5.2H9M-9 5.2H9"/>
+  </svg>`;
+}
+
+/* ── MODEL I — GLOBE (géographie) ── */
+function genExamI() {
+  let body = '';
+  S.sections.forEach((sec, si) => {
+    body += `<div class="i-sec">
+      ${miniGlobeSVG('i-sec-globe')}
+      <span class="i-sec-title">القسم ${ordName(si)}</span>
+      <span class="i-equator"></span>
+      <span class="i-sec-pts">${sec.points} ن</span>
+    </div>`;
+    const single = sec.questions.length === 1;
+    sec.questions.forEach((q, qi) => {
+      body += `<div class="q-box i-q">
+        <div class="q-text">${qTitleHTML(q, single ? '' : `${qi+1}- `)}</div>
+        ${renderQContent(q)}
+      </div>`;
+    });
+  });
+
+  const globe = typeof GLOBE_MAP === 'undefined' ? '' : `
+    <svg class="i-globe" viewBox="${-GLOBE_MAP.r - 6} ${-GLOBE_MAP.r - 6} ${2 * GLOBE_MAP.r + 12} ${2 * GLOBE_MAP.r + 12}"
+         xmlns="http://www.w3.org/2000/svg">
+      <circle class="i-globe-sea" r="${GLOBE_MAP.r}"/>
+      <path class="i-globe-grid" d="${GLOBE_MAP.grid}"/>
+      <g class="i-globe-land">${GLOBE_MAP.land.map(d => `<path d="${d}"/>`).join('')}</g>
+      <circle class="i-globe-rim" r="${GLOBE_MAP.r}"/>
+    </svg>`;
+
+  return `
+    <div class="i-frame"></div>
+    ${globe}
+    <div class="deco-content">
+      ${framedHeaderHTML(`${miniGlobeSVG('i-title-globe')}<div>${examTitleHTML()}</div>${miniGlobeSVG('i-title-globe')}`)}
+      <div class="hw-note-gen">${HW_NOTE}</div>
+      ${body}
+      ${closingHTML()}
+    </div>`;
+}
+
+/* ── MODEL J — CARTHAGE (histoire, Antiquité) ── */
+function genExamJ() {
+  let body = '';
+  S.sections.forEach((sec, si) => {
+    body += `<div class="j-tabula"><div class="j-tabula-in">القسم ${ordName(si)} — (${sec.points} ن)</div></div>`;
+    const single = sec.questions.length === 1;
+    sec.questions.forEach((q, qi) => {
+      body += `<div class="q-box j-q">
+        <div class="q-text">${qTitleHTML(q, single ? '' : `${qi+1}- `)}</div>
+        ${renderQContent(q)}
+      </div>`;
+    });
+  });
+
+  const ns = 'vector-effect="non-scaling-stroke"';
+  const column = `<svg class="j-column" viewBox="0 0 20 100" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg"
+      fill="#fff" stroke="#000" stroke-width="1.3">
+    <rect x="0.5" y="0.5" width="19" height="5" ${ns}/>
+    <path d="M2 5.5 Q10 10 18 5.5" fill="none" ${ns}/>
+    <rect x="3.5" y="8" width="13" height="85" ${ns}/>
+    <path d="M7 9V92M10 9V92M13 9V92" fill="none" stroke-width=".7" ${ns}/>
+    <rect x="1.5" y="93" width="17" height="3" ${ns}/>
+    <rect x="0.5" y="96" width="19" height="3.5" ${ns}/>
+  </svg>`;
+  const pediment = `<svg class="j-pediment" viewBox="0 0 200 24" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg"
+      fill="#fff" stroke="#000" stroke-width="1.5">
+    <path d="M2 23 L100 1.5 L198 23 Z" ${ns}/>
+    <path d="M22 20.5 L100 5 L178 20.5 Z" fill="none" stroke-width=".8" ${ns}/>
+  </svg>`;
+  const tanit = `<svg class="j-tanit" viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg"
+      fill="none" stroke="#000" stroke-width="7" stroke-linejoin="round" stroke-linecap="round">
+    <circle cx="50" cy="20" r="13"/><path d="M12 26 V40 H88 V26"/><path d="M50 40 L18 112 H82 Z"/>
+  </svg>`;
+  const temple = `<div class="j-temple">
+      <div class="j-pediment-wrap">${pediment}${tanit}</div>
+      <div class="j-entablature"></div>
+      <div class="j-temple-row">${column}<div class="j-title">${examTitleHTML()}</div>${column}</div>
+      <div class="j-steps"></div>
+    </div>`;
+  const corner = `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <rect x="1" y="1" width="22" height="22" fill="#fff" stroke="#000" stroke-width="1.4"/>
+    <circle cx="12" cy="12" r="6.5" fill="none" stroke="#000" stroke-width="1.1"/>
+    <path d="M12 5.5V18.5M5.5 12H18.5M7.4 7.4l9.2 9.2M16.6 7.4l-9.2 9.2" stroke="#000" stroke-width=".8"/>
+  </svg>`;
+
+  return `
+    <div class="j-band"></div>
+    ${['tr','tl','br','bl'].map(p => `<div class="j-corner j-corner-${p}">${corner}</div>`).join('')}
+    <div class="deco-content">
+      ${framedHeaderHTML(temple)}
+      <div class="hw-note-gen">${HW_NOTE}</div>
+      ${body}
+      ${closingHTML()}
+    </div>`;
+}
+
+/* ── MODEL K — ÉLÉGANT (diplôme : bordure guillochée, lauriers, coins marqués) ── */
+
+// Laurel branch drawn along a curve; `mirror` gives the right-hand branch
+function laurelSVG(cls, mirror = false) {
+  const P0 = [24, 58], P1 = [4, 36], P2 = [13, 4];
+  const at = t => [
+    (1 - t) ** 2 * P0[0] + 2 * (1 - t) * t * P1[0] + t * t * P2[0],
+    (1 - t) ** 2 * P0[1] + 2 * (1 - t) * t * P1[1] + t * t * P2[1],
+  ];
+  let leaves = '';
+  for (let i = 1; i <= 7; i++) {
+    const t = i / 8, [x, y] = at(t), [x2, y2] = at(t + 0.01);
+    const ang = Math.atan2(y2 - y, x2 - x) * 180 / Math.PI;
+    for (const side of [-1, 1]) {
+      leaves += `<ellipse cx="0" cy="-4.6" rx="1.9" ry="4.4"
+        transform="translate(${x.toFixed(1)} ${y.toFixed(1)}) rotate(${(ang + 90 + side * 52).toFixed(0)})"/>`;
+    }
+  }
+  const [tx, ty] = at(1);
+  leaves += `<ellipse cx="0" cy="-3.6" rx="1.8" ry="3.8" transform="translate(${tx} ${ty}) rotate(15)"/>`;
+  return `<svg class="${cls}" viewBox="0 0 30 62" xmlns="http://www.w3.org/2000/svg"
+      ${mirror ? 'style="transform:scaleX(-1)"' : ''} fill="currentColor" stroke="none">
+    <path d="M${P0} Q${P1} ${P2}" fill="none" stroke="currentColor" stroke-width="1.3"/>${leaves}
+  </svg>`;
+}
+
+function genExamK() {
+  let body = '';
+  S.sections.forEach((sec, si) => {
+    body += `<div class="k-sec">
+      <span class="k-line"></span><i class="k-dia"></i>
+      <span class="k-sec-title">القسم ${ordName(si)} <span class="k-sec-pts">(${sec.points} ن)</span></span>
+      <i class="k-dia"></i><span class="k-line"></span>
+    </div>`;
+    const single = sec.questions.length === 1;
+    sec.questions.forEach((q, qi) => {
+      body += `<div class="q-box k-q">
+        <div class="q-text">${qTitleHTML(q, single ? '' : `${qi+1}- `)}</div>
+        ${renderQContent(q)}
+      </div>`;
+    });
+  });
+
+  const corner = `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor">
+    <rect x="1" y="1" width="22" height="22" fill="#fff" stroke-width="1.4"/>
+    <circle cx="12" cy="12" r="7" stroke-width="1"/><circle cx="12" cy="12" r="3.6" stroke-width="1"/>
+    <circle cx="12" cy="12" r="1.2" fill="currentColor"/>
+  </svg>`;
+
+  return `
+    <div class="k-band"></div>
+    ${['tr','tl','br','bl'].map(p => `<div class="k-corner k-corner-${p}">${corner}</div>`).join('')}
+    <div class="deco-content">
+      ${framedHeaderHTML(`${laurelSVG('k-laurel')}<div>${examTitleHTML()}</div>${laurelSVG('k-laurel', true)}`)}
+      <div class="hw-note-gen">${HW_NOTE}</div>
+      ${body}
+      ${closingHTML()}
+    </div>`;
+}
+
+/* ── MODEL M — ROME (tresse de mosaïque, nœud de Salomon, plaque, couronne de laurier) ── */
+function wreathSVG(cls) {
+  let leaves = '';
+  for (const side of [-1, 1]) {
+    for (let i = 0; i < 7; i++) {
+      const deg = 162 - i * 21;                            // angle from the top: bottom → up each side
+      const a = deg * Math.PI / 180;
+      const x = side * 9.5 * Math.sin(a), y = -9.5 * Math.cos(a);
+      const rot = side * (deg - 90 - 28);                  // along the circle, tilted outwards
+      leaves += `<ellipse cx="${x.toFixed(2)}" cy="${y.toFixed(2)}" rx="1.5" ry="3.3" transform="rotate(${rot.toFixed(0)} ${x.toFixed(2)} ${y.toFixed(2)})"/>`;
+    }
+  }
+  return `<svg class="${cls}" viewBox="-14 -14 28 28" xmlns="http://www.w3.org/2000/svg" fill="currentColor">${leaves}
+    <path d="M-3 11.5Q0 9.5 3 11.5" fill="none" stroke="currentColor" stroke-width="1"/></svg>`;
+}
+
+function genExamM() {
+  let body = '';
+  S.sections.forEach((sec, si) => {
+    body += `<div class="m-sec">
+      <span class="m-wreath">${wreathSVG('m-wreath-svg')}<b>${ROMAN[si] || si + 1}</b></span>
+      <span class="m-sec-title">القسم ${ordName(si)}</span>
+      <span class="m-line"></span>
+      <span class="m-pts">${sec.points} ن</span>
+    </div>`;
+    const single = sec.questions.length === 1;
+    sec.questions.forEach((q, qi) => {
+      body += `<div class="q-box m-q">
+        <div class="q-text">${qTitleHTML(q, single ? '' : `${qi+1}- `)}</div>
+        ${renderQContent(q)}
+      </div>`;
+    });
+  });
+
+  // Solomon's knot — a classic motif of the Roman mosaics of Tunisia
+  const knot = `<svg viewBox="-12 -12 24 24" xmlns="http://www.w3.org/2000/svg" fill="none">
+    <rect x="-11.3" y="-11.3" width="22.6" height="22.6" fill="#fff" stroke="currentColor" stroke-width="1.4"/>
+    <g stroke-linecap="round">
+      <rect x="-7.5" y="-3" width="15" height="6" rx="3" transform="rotate(45)" stroke="currentColor" stroke-width="3.2"/>
+      <rect x="-7.5" y="-3" width="15" height="6" rx="3" transform="rotate(45)" stroke="#fff" stroke-width="1.3"/>
+      <rect x="-7.5" y="-3" width="15" height="6" rx="3" transform="rotate(-45)" stroke="currentColor" stroke-width="3.2"/>
+      <rect x="-7.5" y="-3" width="15" height="6" rx="3" transform="rotate(-45)" stroke="#fff" stroke-width="1.3"/>
+    </g>
+  </svg>`;
+  const rivets = ['tl','tr','bl','br'].map(p => `<i class="m-rivet m-rivet-${p}"></i>`).join('');
+
+  return `
+    <div class="m-band"></div>
+    ${['tr','tl','br','bl'].map(p => `<div class="m-corner m-corner-${p}">${knot}</div>`).join('')}
+    <div class="deco-content">
+      <div class="m-attic"></div>
+      ${framedHeaderHTML(`<div class="m-plaque">${rivets}<div>${examTitleHTML()}</div></div>`)}
+      <div class="hw-note-gen">${HW_NOTE}</div>
+      ${body}
+      ${closingHTML()}
+    </div>`;
+}
+
+/* ── MODEL N — EL JEM (plan de l'amphithéâtre, façade à arcades) ── */
+function genExamN() {
+  let body = '';
+  S.sections.forEach((sec, si) => {
+    body += `<div class="n-sec">
+      <span class="n-sec-title">القسم ${ordName(si)}</span>
+      <span class="n-arcade"></span>
+      <span class="n-pts">${sec.points} ن</span>
+    </div>`;
+    const single = sec.questions.length === 1;
+    sec.questions.forEach((q, qi) => {
+      body += `<div class="q-box n-q">
+        <div class="q-text">${qTitleHTML(q, single ? '' : `${qi+1}- `)}</div>
+        ${renderQContent(q)}
+      </div>`;
+    });
+  });
+
+  // Elliptical plan: outer wall, arena, and the tiers of seats between them
+  let rays = '';
+  for (let i = 0; i < 36; i++) {
+    const a = i * Math.PI / 18, c = Math.cos(a), s = Math.sin(a);
+    rays += `M${(100 + 82 * c).toFixed(1)} ${(40 + 30 * s).toFixed(1)}L${(100 + 97 * c).toFixed(1)} ${(40 + 38 * s).toFixed(1)}`;
+  }
+  const ns = 'vector-effect="non-scaling-stroke"';
+  const arena = `<svg class="n-arena-bg" viewBox="0 0 200 80" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg"
+      fill="none" stroke="currentColor">
+    <ellipse cx="100" cy="40" rx="97" ry="38" stroke-width="1.6" ${ns}/>
+    <ellipse cx="100" cy="40" rx="89" ry="34" stroke-width=".6" ${ns}/>
+    <ellipse cx="100" cy="40" rx="82" ry="30" stroke-width="1.2" ${ns}/>
+    <path d="${rays}" stroke-width=".6" ${ns}/>
+  </svg>`;
+
+  return `
+    <div class="n-frame"></div>
+    <div class="n-facade"></div>
+    <div class="deco-content">
+      ${framedHeaderHTML(`<div class="n-arena">${arena}<div class="n-arena-text">${examTitleHTML()}</div></div>`)}
+      <div class="hw-note-gen">${HW_NOTE}</div>
       ${body}
       ${closingHTML()}
     </div>`;
@@ -1332,6 +1562,7 @@ function printExam() {
     alert('Impossible d\'imprimer : le total des sections dépasse 18 points.');
     return;
   }
+  if (isTouchDevice()) { sharePDF(); return; }
   if (storageGet(PRINT_HELP_KEY) === '1') { window.print(); return; }
   const over = !document.getElementById('page-warn')?.hidden;
   document.getElementById('print-help-over').hidden = !over;
@@ -1718,6 +1949,147 @@ function importFile(event) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// PDF — built in the browser (works on phones, where printing often does nothing),
+// then shared (WhatsApp, e-mail…) through the phone's share menu, or downloaded
+// ─────────────────────────────────────────────────────────────────────────────
+
+const PDF_LIBS = [
+  'https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.js',
+  'https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js',
+];
+let _pdfLibs = null, _pdfFile = null, _pdfBusy = false;
+
+// 794 px (A4 width) × 3.5 ≈ 2780 px → about 340 DPI: sharp text, good master for photocopies
+const PDF_PIXEL_RATIO  = 3.5;
+const PDF_JPEG_QUALITY = 0.95;
+
+function loadScript(src) {
+  return new Promise((resolve, reject) => {
+    const s = document.createElement('script');
+    s.src = src;
+    s.onload = resolve;
+    s.onerror = () => reject(new Error('Chargement impossible : ' + src));
+    document.head.appendChild(s);
+  });
+}
+
+function loadPdfLibs() {
+  if (!_pdfLibs) _pdfLibs = Promise.all(PDF_LIBS.map(loadScript)).catch(err => { _pdfLibs = null; throw err; });
+  return _pdfLibs;
+}
+
+// Phones / tablets: no usable print dialog → the print button makes a PDF instead
+function isTouchDevice() {
+  return window.matchMedia('(pointer: coarse)').matches && window.innerWidth < 1024;
+}
+
+async function makePdfBlob() {
+  await loadPdfLibs();
+  if (document.fonts && document.fonts.ready) await document.fonts.ready;
+
+  // Render a clean, unzoomed copy of the page off-screen (the preview may be scaled or hidden on phones)
+  const src = document.getElementById('exam-a4');
+  const holder = document.createElement('div');
+  holder.style.cssText = 'position:fixed;left:-10000px;top:0;width:210mm;background:#fff;';
+  const page = document.createElement('div');
+  page.className = src.className;
+  page.setAttribute('dir', 'rtl');
+  page.setAttribute('lang', 'ar');
+  page.innerHTML = src.innerHTML;
+  page.querySelectorAll('.page-guide').forEach(n => n.remove());
+  page.style.boxShadow = 'none';
+  holder.appendChild(page);
+  document.body.appendChild(holder);
+
+  try {
+    const W = page.offsetWidth;
+    const pageH = Math.round(W * 297 / 210);
+    const pages = Math.max(1, Math.ceil((Math.max(examContentHeight(page), pageH) - 2) / pageH));
+
+    // Each A4 page is captured on its own through a page-sized window, so the resolution
+    // stays high (≈ 340 DPI) without exceeding phone canvas limits (~16 Mpx on iPhone).
+    const clip = document.createElement('div');
+    clip.style.cssText = `position:relative;width:${W}px;height:${pageH}px;overflow:hidden;background:#fff;`;
+    holder.appendChild(clip);
+    clip.appendChild(page);
+
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF({ unit: 'mm', format: 'a4', compress: true });
+    for (let i = 0; i < pages; i++) {
+      page.style.marginTop = `${-i * pageH}px`;
+      const canvas = await htmlToImage.toCanvas(clip, {
+        pixelRatio: PDF_PIXEL_RATIO, backgroundColor: '#ffffff', width: W, height: pageH,
+      });
+      if (i) pdf.addPage();
+      pdf.addImage(canvas.toDataURL('image/jpeg', PDF_JPEG_QUALITY), 'JPEG', 0, 0, 210, 297, undefined, 'FAST');
+    }
+    pdf.setProperties({ title: examTitle() });
+    return pdf.output('blob');
+  } finally {
+    holder.remove();
+  }
+}
+
+async function sharePDF() {
+  if (_pdfBusy) return;
+  if (totalPoints() > 18) {
+    alert('Impossible de créer le PDF : le total des sections dépasse 18 points.');
+    return;
+  }
+  _pdfBusy = true;
+  setPdfButtons(true);
+  try {
+    const blob = await makePdfBlob();
+    _pdfFile = new File([blob], safeName(examTitle()) + '.pdf', { type: 'application/pdf' });
+    showPdfReady();
+  } catch (err) {
+    alert("Le PDF n'a pas pu être créé. Vérifiez la connexion Internet puis réessayez.\n\n(" + (err && err.message) + ')');
+  } finally {
+    _pdfBusy = false;
+    setPdfButtons(false);
+  }
+}
+
+function setPdfButtons(busy) {
+  document.querySelectorAll('.btn-pdf').forEach(b => {
+    b.disabled = busy;
+    b.textContent = busy ? '⏳ Préparation du PDF…' : b.dataset.label;
+  });
+}
+
+function canShareFile(file) {
+  try { return !!(navigator.canShare && navigator.canShare({ files: [file] })); } catch { return false; }
+}
+
+// Second step with a fresh tap: phones only allow the share menu right after a user gesture
+function showPdfReady() {
+  const kb = Math.max(1, Math.round(_pdfFile.size / 1024));
+  document.getElementById('pdf-name').textContent = `${_pdfFile.name} (${kb < 1024 ? kb + ' Ko' : (kb / 1024).toFixed(1) + ' Mo'})`;
+  document.getElementById('pdf-share').hidden = !canShareFile(_pdfFile);
+  document.getElementById('pdf-ready').hidden = false;
+}
+
+function closePdfReady() { document.getElementById('pdf-ready').hidden = true; }
+
+async function doSharePdf() {
+  try {
+    await navigator.share({ files: [_pdfFile], title: examTitle() });
+    closePdfReady();
+  } catch (err) {
+    if (err && err.name === 'AbortError') return;           // the user closed the share menu
+    downloadPdf();
+  }
+}
+
+function downloadPdf() {
+  const url = URL.createObjectURL(_pdfFile);
+  Object.assign(document.createElement('a'), { href: url, download: _pdfFile.name }).click();
+  setTimeout(() => URL.revokeObjectURL(url), 60000);
+  closePdfReady();
+  toast('📄 PDF enregistré (dossier Téléchargements).');
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // SMALL UI HELPERS — dialog with custom buttons, toast message
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -1798,12 +2170,26 @@ function showTab(tab) {
  * preview at the end of page 1 + message in the form footer.
  * Width and height are read in the same (zoomed) space, so the ratio holds on mobile too.
  */
+/**
+ * Height actually used by the exam content. Decorations (frames, watermarks, a globe
+ * sticking out of a corner) are absolutely positioned and must not count — scrollHeight
+ * would include them even when they are clipped.
+ */
+function examContentHeight(el) {
+  let bottom = 0;
+  for (const child of el.children) {
+    if (getComputedStyle(child).position === 'absolute') continue;
+    bottom = Math.max(bottom, child.offsetTop + child.offsetHeight);
+  }
+  return bottom + parseFloat(getComputedStyle(el).paddingBottom || 0);
+}
+
 function checkPageOverflow() {
   const el = document.getElementById('exam-a4');
   if (!el) return;
   el.querySelector('.page-guide')?.remove();
   const pageH = el.offsetWidth * 297 / 210;
-  const over = el.scrollHeight > pageH + 2;
+  const over = examContentHeight(el) > pageH + 2;
   if (over) {
     el.insertAdjacentHTML('beforeend',
       '<div class="page-guide"><span>Fin de la page 1 — la suite sera imprimée sur une 2e page</span></div>');

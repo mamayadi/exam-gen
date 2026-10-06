@@ -6,7 +6,7 @@
   <title>Générateur d'Examens — Histoire &amp; Géographie</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;900&family=Noto+Naskh+Arabic:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;900&family=Noto+Naskh+Arabic:wght@400;600;700&display=swap" rel="stylesheet" crossorigin="anonymous">
   <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
@@ -43,6 +43,10 @@
       <div id="exam-a4" class="exam-a4"></div>
     </div>
 
+    <div class="preview-actions">
+      <button class="btn btn-share btn-lg btn-pdf" data-label="📤 Partager en PDF" onclick="sharePDF()">📤 Partager en PDF</button>
+    </div>
+
   </div>
 
 </div>
@@ -59,6 +63,8 @@
         <b>« Enregistrer au format PDF »</b>, puis cliquez sur <b>Enregistrer</b>.</li>
       <li><b>Pour imprimer sur papier</b> : choisissez votre imprimante, puis <b>Imprimer</b>.</li>
     </ol>
+    <p class="modal-tip">💡 Pour envoyer l'examen (WhatsApp, e-mail…), utilisez plutôt
+      <b>📤 Partager en PDF</b>.</p>
     <label class="chk"><input type="checkbox" id="print-help-skip"> Ne plus afficher ce message</label>
     <div class="modal-actions">
       <button class="btn btn-ghost" onclick="closePrintHelp(false)">Annuler</button>
@@ -98,9 +104,23 @@
   </div>
 </div>
 
+<!-- PDF ready: share or download (needs a fresh tap on phones) -->
+<div id="pdf-ready" class="modal-backdrop" hidden onclick="if (event.target === this) closePdfReady()">
+  <div class="modal" role="dialog" aria-labelledby="pdf-title">
+    <h3 id="pdf-title">📄 Le PDF est prêt</h3>
+    <p id="pdf-name" class="pdf-name" dir="auto"></p>
+    <div class="pdf-actions">
+      <button id="pdf-share" class="btn btn-share btn-lg btn-block" onclick="doSharePdf()">📤 Partager (WhatsApp, e-mail…)</button>
+      <button class="btn btn-primary btn-lg btn-block" onclick="downloadPdf()">⬇ Télécharger le PDF</button>
+      <button class="btn btn-ghost btn-block" onclick="closePdfReady()">Fermer</button>
+    </div>
+  </div>
+</div>
+
 <div id="toast" class="toast" hidden></div>
 
 <script src="assets/js/europe-map.js"></script>
+<script src="assets/js/globe-map.js"></script>
 <script src="assets/js/app.js"></script>
 </body>
 </html>

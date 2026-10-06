@@ -30,18 +30,24 @@ exam-gen/
 ### Étape 1 — Choisir le modèle
 L'application s'ouvre directement sur le formulaire. En haut, la carte **🎨 Modèle de l'examen** affiche une miniature de chaque modèle : un clic change le style de l'aperçu sans effacer les questions déjà saisies.
 
-Sept modèles sont disponibles (miniatures générées automatiquement à partir du vrai rendu) :
+Onze modèles sont disponibles (miniatures générées automatiquement à partir du vrai rendu) :
 
 | Modèle | Style |
 |---|---|
 | **Décoré** (par défaut) | Double cadre à coins grecs, titre accroché au cadre, bandeaux ardoise / parchemin, filigrane en bas de page : carte d'Europe + rose des vents (défaut), rose des vents + quadrillage, image personnalisée ou aucun |
 | **Manuscrit** | Parchemin enroulé, cartouche, rubans de section, sceau rond pour la note |
-| **Carte ancienne** | Bordure graduée noir/blanc avec degrés, cartouche, repères 📍 pour les points, échelle et rose des vents |
+| **Globe** | En-tête entièrement encadré (professeur, titre, niveau + ligne élève), vrai globe terrestre centré sur la Tunisie en filigrane, titres de section en « équateur » gradué |
+| **Carthage** | Bordure à méandre grec, en-tête en temple antique (fronton avec signe de Tanit, colonnes, marches), titres de section sur plaque romaine (tabula ansata) |
+| **Élégant** | Style « diplôme » : bordure guillochée, coins à rosace, en-tête encadré avec branches de laurier, titres de section centrés entre doubles filets, questions dans des cadres à coins marqués — idéal pour les devoirs de synthèse |
+| **Rome** | Bordure en tresse de mosaïque romaine, nœuds de Salomon aux coins, corniche à denticules, titre sur plaque à rivets, sections I, II dans une couronne de laurier |
+| **El Jem** | Titre au centre du plan elliptique de l'amphithéâtre, façade à trois étages d'arcades en filigrane, titres de section suivis d'une rangée d'arches |
 | **Fil du temps** | En-tête en frise horizontale, ligne du temps verticale reliant sections (I, II…) et questions |
 | **Archives** | Feuille perforée + trombone, sections en onglets de classeur, questions en fiches, points en tampons |
 | **Classique** / **Moderne** | Modèles A et B d'origine |
 
-Options communes : icône par type de question (plume, livre, sablier, carte), phrase de fin (« بالتوفيق والنجاح »…), et style automatique selon la matière (Histoire → Manuscrit, Géographie → Carte ancienne). Dans les modèles décorés, une section contenant une seule question n'affiche pas de numéro.
+Option **⚫ Noir et blanc** (cochée par défaut) : tous les modèles passent en noir pur sur blanc — pas de fonds teintés (qui deviennent un gris tacheté à la photocopie), traits noirs, carte d'Europe réduite à des contours légers. L'aperçu montre exactement ce qui sera imprimé ; décocher pour une version en couleur.
+
+Options communes : icône par type de question (plume, livre, sablier, carte), phrase de fin (« بالتوفيق والنجاح »…), et style automatique selon la matière (Histoire → Carthage, Géographie → Globe). Dans les modèles décorés, une section contenant une seule question n'affiche pas de numéro.
 
 | Modèle A — Classique | Modèle B — Moderne |
 |---|---|
@@ -109,16 +115,25 @@ Si l'examen ne tient plus sur une page A4, une **ligne rouge en pointillés** ap
 
 ---
 
-## Impression / Export PDF
+## Impression et PDF
 
-Cliquer sur **🖨 Imprimer / créer le PDF** (en bas du formulaire).
+### 🖨 Imprimer (ordinateur)
 Une petite fenêtre d'aide explique comment choisir « Enregistrer au format PDF » ou une imprimante
-(elle peut être masquée définitivement avec « Ne plus afficher ce message »),
-puis la boîte de dialogue d'impression du navigateur s'ouvre.
+(masquable avec « Ne plus afficher ce message »), puis la boîte de dialogue d'impression du navigateur s'ouvre.
 
-- Format A4, marges zéro, rendu couleur fidèle.
-- Toute l'interface est masquée ; seul l'examen apparaît.
+- Format A4, marges zéro, rendu couleur fidèle ; seul l'examen est imprimé.
 - Les questions ne sont pas coupées entre deux pages (`page-break-inside: avoid`).
+
+### 📤 Partager en PDF (ordinateur et téléphone)
+Crée un vrai fichier PDF A4 dans le navigateur (≈ 0,5 Mo par page, polices arabes incluses), puis propose :
+**Partager** (menu de partage du téléphone : WhatsApp, e-mail…) ou **Télécharger le PDF**.
+
+- Sur téléphone/tablette, le bouton **Imprimer** crée directement le PDF (l'impression du navigateur y est souvent inopérante,
+  notamment dans les navigateurs intégrés de WhatsApp/Messenger). Le PDF peut ensuite être imprimé depuis le téléphone.
+- Sur téléphone, le bouton est aussi présent sous l'aperçu (onglet « Aperçu »).
+- Les bibliothèques [html-to-image](https://github.com/bubkoo/html-to-image) et [jsPDF](https://github.com/parallax/jsPDF)
+  sont chargées depuis jsDelivr au premier clic (connexion Internet nécessaire).
+- Le PDF est une image haute définition de la page (texte non sélectionnable).
 
 ---
 
@@ -187,4 +202,4 @@ Pour ajouter un **Modèle C** : créer une classe `.model-c` dans `style.css`, a
 - SVG pour la frise chronologique (impression vectorielle nette)
 - `FileReader` API pour l'import d'images
 - `Blob` + `URL.createObjectURL` pour l'export JSON
-- Fond de carte d'Europe (`assets/js/europe-map.js`) généré à partir de [Natural Earth](https://www.naturalearthdata.com/) 1:50m — domaine public
+- Fond de carte d'Europe (`assets/js/europe-map.js`) et globe (`assets/js/globe-map.js`) générés à partir de [Natural Earth](https://www.naturalearthdata.com/) 1:50m — domaine public

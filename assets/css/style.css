@@ -90,6 +90,7 @@ html, body {
   line-height: 1.4;
 }
 .chk input { margin-top: 2px; }
+.chk-strong { font-weight: 600; color: #212529; }
 
 /* =====================================================================
    MAIN APP
@@ -375,6 +376,8 @@ html, body {
 .btn-secondary { background: #636e72; color: #fff; }
 .btn-secondary:hover:not(:disabled) { background: #4d5860; }
 .btn-ghost { background: transparent; color: #636e72; border: 1px solid #dee2e6; }
+.btn-share { background: #e8590c; color: #fff; }
+.btn-share:hover:not(:disabled) { background: #d9480f; }
 .btn-ghost:hover:not(:disabled) { background: #f8f9fa; color: #2d3436; }
 .btn-sm { padding: 6px 11px; font-size: 13px; }
 .btn-lg { padding: 12px 18px; font-size: 16px; }
@@ -415,6 +418,7 @@ label.btn { cursor: pointer; }
 /* Footer actions */
 #form-footer > .btn-block { margin-bottom: 8px; }
 .footer-row { display: flex; gap: 8px; }
+#form-footer .btn-pdf { margin-top: 8px; }
 .footer-row > .btn { flex: 1; justify-content: center; }
 .footer-meta {
   display: flex;
@@ -470,6 +474,14 @@ label.btn { cursor: pointer; }
 .modal h3 { font-size: 18px; margin-bottom: 10px; }
 .modal ol { padding-left: 22px; margin: 6px 0 14px; }
 .modal li { margin-bottom: 6px; }
+.modal-tip { background: #fff4e6; color: #a5440b; border-radius: 6px; padding: 6px 10px; font-size: 14px; }
+.pdf-name { color: #495057; font-size: 14px; word-break: break-word; margin: 6px 0 14px; }
+.pdf-actions { display: flex; flex-direction: column; gap: 8px; }
+.pdf-actions [hidden] { display: none; }
+
+/* Share button under the preview: phones only (the form footer is not visible on the Aperçu tab) */
+.preview-actions { display: none; order: 2; }
+
 .modal-warn { background: #fff5f5; color: #c92a2a; border-radius: 6px; padding: 6px 10px; margin-bottom: 8px; }
 .modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
 .dialog-top { z-index: 110; }
@@ -966,29 +978,27 @@ label.btn { cursor: pointer; }
 .model-c .c-sep b { font-size: 12pt; font-weight: 400; }
 
 /* Section banners (alternating dark / parchment) */
+/* Section banners: all attached to the right edge of the frame, same shape (dark / parchment alternate) */
 .model-c .c-banner {
   display: block;
   width: fit-content;
   min-width: 62mm;
-  margin: 4mm 0 2mm auto;
-  padding: 4px 22px;
-  border-radius: 8px;
+  margin: 4mm -7.4mm 2mm auto;
+  padding: 4px calc(22px + 7.4mm) 4px 22px;
+  border-radius: 12px 0 0 12px;
+  border-right: none !important;
   font-family: 'Cairo', sans-serif;
   font-size: 14pt;
   font-weight: 800;
   text-align: right;
 }
 .model-c .c-banner-dark {
-  margin-right: -7.4mm;
-  padding-right: calc(22px + 7.4mm);
-  border-radius: 12px 0 0 12px;
   background: #3e4c5e;
   color: #fff;
   border: 1.5px solid #3e4c5e;
   box-shadow: inset 0 0 0 2px #fff;
 }
 .model-c .c-banner-light {
-  border-radius: 14px;
   background: #eadcc4;
   color: #3b2f22;
   border: 1.5px solid #8a7350;
@@ -1203,145 +1213,6 @@ label.btn { cursor: pointer; }
   font-family: 'Cairo', sans-serif;
 }
 .model-d .exam-closing { color: #5a4630; }
-
-/* =====================================================================
-   MODEL E — CARTE ANCIENNE
-===================================================================== */
-.exam-a4.model-e { padding: 15mm 16mm 23mm; }
-
-.model-e .e-frame {
-  position: absolute;
-  inset: 6mm;
-  border: 1.4px solid #333;
-  background:
-    repeating-linear-gradient(90deg,  #333 0 10mm, transparent 10mm 20mm) top    / 100% 2.4mm no-repeat,
-    repeating-linear-gradient(90deg,  #333 0 10mm, transparent 10mm 20mm) bottom / 100% 2.4mm no-repeat,
-    repeating-linear-gradient(180deg, #333 0 10mm, transparent 10mm 20mm) left   / 2.4mm 100% no-repeat,
-    repeating-linear-gradient(180deg, #333 0 10mm, transparent 10mm 20mm) right  / 2.4mm 100% no-repeat;
-}
-.model-e .e-frame::after {
-  content: '';
-  position: absolute;
-  inset: 2.4mm;
-  border: 1px solid #333;
-  background: #fff;
-}
-
-.model-e .e-deg {
-  position: absolute;
-  display: flex;
-  justify-content: space-between;
-  font-family: Georgia, serif;
-  font-size: 6.5pt;
-  color: #333;
-  direction: ltr;
-  line-height: 1;
-}
-.model-e .e-deg-top    { top: 2.2mm;    left: 16mm; right: 16mm; }
-.model-e .e-deg-bottom { bottom: 2.2mm; left: 16mm; right: 16mm; }
-.model-e .e-deg-side   { top: 30mm; bottom: 30mm; flex-direction: column; width: 5mm; align-items: center; }
-.model-e .e-deg-right  { right: .5mm; }
-.model-e .e-deg-left   { left: .5mm; }
-
-.model-e .e-hdr { display: flex; align-items: center; gap: 5mm; }
-.model-e .e-hdr-side {
-  flex: 1;
-  border: 1px solid #333;
-  outline: .6px solid #333;
-  outline-offset: 2px;
-  padding: 5px 10px;
-  font-size: 10pt;
-  line-height: 1.75;
-  font-family: 'Cairo', sans-serif;
-  background: #fff;
-}
-.model-e .orn-sep { color: #333; }
-.model-e .e-star { width: 6mm; height: 6mm; }
-
-.model-e .e-stu-row { display: flex; align-items: center; gap: 6mm; }
-.model-e .e-grade {
-  flex-shrink: 0;
-  border: 1.3px solid #333;
-  font-family: 'Cairo', sans-serif;
-  text-align: center;
-  min-width: 28mm;
-  background: #fff;
-}
-.model-e .e-grade span {
-  display: block;
-  border-bottom: 1px solid #333;
-  font-size: 8.5pt;
-  font-weight: 700;
-  background: #eee;
-}
-.model-e .e-grade b { display: block; padding: 3px 8px; font-size: 10pt; }
-
-.model-e .e-sec {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin: 3mm 0 1.5mm;
-}
-.model-e .e-sec-title {
-  font-family: 'Cairo', sans-serif;
-  font-size: 13.5pt;
-  font-weight: 800;
-  border-bottom: 2px solid #333;
-  line-height: 1.5;
-}
-.model-e .e-route { flex: 1; border-top: 1.8px dashed #555; }
-.model-e .e-pin {
-  width: 10.5mm;
-  height: 10.5mm;
-  margin-bottom: 2.5mm;
-  border: 1.6px solid #333;
-  border-radius: 50% 50% 50% 0;
-  transform: rotate(-45deg);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #fff;
-}
-.model-e .e-pin b {
-  transform: rotate(45deg);
-  font-family: 'Cairo', sans-serif;
-  font-size: 9pt;
-  white-space: nowrap;
-}
-
-.model-e .e-q {
-  border: 3px double #444;
-  padding: 7px 12px 10px;
-  margin-bottom: 3.5mm;
-  background: #fff;
-  page-break-inside: avoid;
-}
-.model-e .q-text {
-  font-size: 12pt;
-  font-weight: 700;
-  margin-bottom: 2mm;
-  font-family: 'Cairo', sans-serif;
-}
-
-.model-e .e-footer {
-  position: absolute;
-  left: 15mm;
-  right: 15mm;
-  bottom: 9mm;
-  height: 13mm;
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  direction: ltr;
-  z-index: 1;
-}
-.model-e .e-scale { font-family: 'Cairo', sans-serif; font-size: 7pt; width: 48mm; }
-.model-e .e-scale-title { text-align: center; font-weight: 700; direction: rtl; }
-.model-e .e-scale-bar { display: flex; border: 1px solid #333; height: 2.2mm; }
-.model-e .e-scale-bar i { flex: 1; }
-.model-e .e-scale-bar i:nth-child(odd) { background: #333; }
-.model-e .e-scale-lbl { display: flex; justify-content: space-between; line-height: 1.4; }
-.model-e .e-compass { width: 13mm; height: 13mm; }
 
 /* =====================================================================
    MODEL G — FIL DU TEMPS (ligne du temps verticale)
@@ -1799,6 +1670,609 @@ label.btn { cursor: pointer; }
 }
 
 /* =====================================================================
+   FRAMED HEADER (Globe, Carthage) — teacher | title | level + student line, one double frame
+===================================================================== */
+.fh {
+  border: 1.8px solid #000;
+  outline: .8px solid #000;
+  outline-offset: 2.5px;
+  margin: 1mm 1mm 2.5mm;
+  font-family: 'Cairo', sans-serif;
+  background: #fff;
+}
+.fh-top { display: flex; align-items: stretch; }
+.fh-side {
+  flex: 1;
+  padding: 6px 10px;
+  font-size: 10.5pt;
+  line-height: 1.8;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.fh-side b { font-weight: 700; }
+.fh-side > div { white-space: nowrap; }
+.fh-title {
+  flex: 1.35;
+  border-left: 1.4px solid #000;
+  border-right: 1.4px solid #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 6px 8px;
+  text-align: center;
+  font-family: 'Noto Naskh Arabic', 'Cairo', serif;
+  font-size: 16.5pt;
+  font-weight: 700;
+  line-height: 1.45;
+}
+.fh-bottom {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  border-top: 1.4px solid #000;
+  padding: 6px 10px 7px;
+  font-size: 10.5pt;
+  white-space: nowrap;
+}
+.fh-grade { border: 1.4px solid #000; padding: 0 10px; font-weight: 700; }
+
+/* =====================================================================
+   MODEL I — GLOBE (géographie)
+===================================================================== */
+.exam-a4.model-i { padding: 15mm 15mm 14mm; }
+
+.model-i .i-frame {
+  position: absolute;
+  inset: 6mm;
+  border: 1.8px solid #000;
+  border-radius: 5mm;
+  z-index: 1;
+  pointer-events: none;
+}
+.model-i .i-frame::after {
+  content: '';
+  position: absolute;
+  inset: 1.6mm;
+  border: .7px solid #000;
+  border-radius: 3.6mm;
+}
+
+/* Real globe (orthographic, centred on Tunisia), cut by the bottom-left corner */
+.model-i .i-globe {
+  position: absolute;
+  width: 105mm;
+  height: 105mm;
+  left: -22mm;
+  bottom: -26mm;
+  z-index: 0;
+  opacity: .55;
+  pointer-events: none;
+}
+.model-i .i-globe-sea  { fill: #dbeaf6; }
+.model-i .i-globe-grid { fill: none; stroke: #9db4c8; stroke-width: 1.6; }
+.model-i .i-globe-land { fill: #efe6cf; stroke: #6b5b3e; stroke-width: 1.6; stroke-linejoin: round; }
+.model-i .i-globe-rim  { fill: none; stroke: #1f4e79; stroke-width: 5; }
+
+.model-i .fh-title { flex: 1.45; gap: 6px; background: #eaf3fb; color: #12355b; font-size: 15pt; }
+.model-i .fh-side { font-size: 10pt; padding: 6px 8px; }
+.model-i .i-title-globe { width: 7mm; height: 7mm; flex-shrink: 0; color: #1f4e79; }
+
+.model-i .i-sec { display: flex; align-items: center; gap: 8px; margin: 4.5mm 0 2.5mm; }
+.model-i .i-sec-globe { width: 7.5mm; height: 7.5mm; flex-shrink: 0; color: #1f4e79; }
+.model-i .i-sec-title {
+  font-family: 'Cairo', sans-serif;
+  font-size: 13.5pt;
+  font-weight: 800;
+  white-space: nowrap;
+}
+.model-i .i-equator {                 /* equator line with degree ticks */
+  flex: 1;
+  height: 3mm;
+  background:
+    linear-gradient(#000, #000) center / 100% 1.5px no-repeat,
+    repeating-linear-gradient(90deg, #000 0 1.2px, transparent 1.2px 5mm) center / 100% 2.6mm no-repeat;
+}
+.model-i .i-sec-pts {
+  background: #1f4e79;
+  color: #fff;
+  border-radius: 12px;
+  padding: 1px 12px;
+  font-family: 'Cairo', sans-serif;
+  font-size: 11pt;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.model-i .i-q {
+  border: 1.4px solid #1f4e79;
+  border-radius: 10px;
+  padding: 7px 12px 10px;
+  margin-bottom: 3.5mm;
+  page-break-inside: avoid;
+}
+.model-i .q-text { font-family: 'Cairo', sans-serif; font-size: 12pt; font-weight: 700; margin-bottom: 2mm; }
+
+/* =====================================================================
+   MODEL J — CARTHAGE (Antiquité : méandre grec, temple, tabula ansata, signe de Tanit)
+===================================================================== */
+.exam-a4.model-j { padding: 17mm 17mm 16mm; }
+
+.model-j .j-band {
+  position: absolute;
+  inset: 5mm;
+  border: 1.4px solid #000;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M0 2H24M0 22H24M3 22V6H19V18H8V10H15V14H11' fill='none' stroke='%23000' stroke-width='1.6'/%3E%3C/svg%3E") left top / 6mm 6mm repeat-x,
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M0 2H24M0 22H24M3 22V6H19V18H8V10H15V14H11' fill='none' stroke='%23000' stroke-width='1.6'/%3E%3C/svg%3E") left bottom / 6mm 6mm repeat-x,
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cg transform='rotate(90 12 12)'%3E%3Cpath d='M0 2H24M0 22H24M3 22V6H19V18H8V10H15V14H11' fill='none' stroke='%23000' stroke-width='1.6'/%3E%3C/g%3E%3C/svg%3E") left top / 6mm 6mm repeat-y,
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cg transform='rotate(90 12 12)'%3E%3Cpath d='M0 2H24M0 22H24M3 22V6H19V18H8V10H15V14H11' fill='none' stroke='%23000' stroke-width='1.6'/%3E%3C/g%3E%3C/svg%3E") right top / 6mm 6mm repeat-y;
+}
+.model-j .j-band::after {
+  content: '';
+  position: absolute;
+  inset: 6mm;
+  border: 1.4px solid #000;
+  background: #fff;
+}
+.model-j .j-corner { position: absolute; width: 9mm; height: 9mm; z-index: 2; }
+.model-j .j-corner svg { display: block; width: 100%; height: 100%; }
+.model-j .j-corner-tr { top: 3.5mm;    right: 3.5mm; }
+.model-j .j-corner-tl { top: 3.5mm;    left: 3.5mm; }
+.model-j .j-corner-br { bottom: 3.5mm; right: 3.5mm; }
+.model-j .j-corner-bl { bottom: 3.5mm; left: 3.5mm; }
+
+/* Header: a small temple (pediment, entablature, two columns, steps) */
+.model-j .fh-title { padding: 5px 8px 4px; background: #f6efe0; color: #3b2f22; }
+.model-j .j-temple { width: 100%; display: flex; flex-direction: column; }
+.model-j .j-pediment-wrap { position: relative; }
+.model-j .j-pediment { display: block; width: 100%; height: 9mm; margin-bottom: -1px; }
+.model-j .j-tanit {                    /* sign of Tanit in the tympanum */
+  position: absolute;
+  left: 50%;
+  bottom: .9mm;
+  width: 4.2mm;
+  height: 5mm;
+  transform: translateX(-50%);
+}
+.model-j .j-pediment path:first-child { fill: #efe3c8; }
+.model-j .j-entablature { height: 2mm; border: 1.4px solid #000; background: #fff; }
+.model-j .j-temple-row { display: flex; align-items: stretch; gap: 3mm; height: 19mm; padding: 0 2mm; }
+.model-j .j-column { width: 5.5mm; height: 100%; flex-shrink: 0; }
+.model-j .j-title {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15.5pt;
+  line-height: 1.4;
+}
+.model-j .j-steps {
+  height: 2.4mm;
+  margin: 0 -2mm;
+  border-top: 1.4px solid #000;
+  border-bottom: 1.4px solid #000;
+  background: #fff;
+}
+
+/* Section titles on a Roman plaque with dovetail handles (tabula ansata) */
+.model-j .j-tabula {
+  width: fit-content;
+  margin: 5mm auto 3mm;
+  padding: 1.6px;
+  background: #000;
+  clip-path: polygon(16px 0, calc(100% - 16px) 0, calc(100% - 16px) 38%, 100% 8%, 100% 92%,
+    calc(100% - 16px) 62%, calc(100% - 16px) 100%, 16px 100%, 16px 62%, 0 92%, 0 8%, 16px 38%);
+}
+.model-j .j-tabula-in {
+  padding: 4px 42px;
+  background: #f3ead7;
+  color: #3b2f22;
+  font-family: 'Cairo', sans-serif;
+  font-size: 13.5pt;
+  font-weight: 800;
+  clip-path: polygon(14.6px 0, calc(100% - 14.6px) 0, calc(100% - 14.6px) 38%, 100% 8%, 100% 92%,
+    calc(100% - 14.6px) 62%, calc(100% - 14.6px) 100%, 14.6px 100%, 14.6px 62%, 0 92%, 0 8%, 14.6px 38%);
+}
+.model-j .j-q {
+  border: 1.3px solid #000;
+  border-top: 3.5px double #000;
+  padding: 7px 12px 10px;
+  margin-bottom: 3.5mm;
+  page-break-inside: avoid;
+}
+.model-j .q-text { font-family: 'Cairo', sans-serif; font-size: 12pt; font-weight: 700; margin-bottom: 2mm; }
+
+/* Black & white versions */
+.bw .fh-title { background: #fff !important; color: #000 !important; }
+.model-i.bw .i-globe { opacity: .6; }
+.model-i.bw .i-globe-sea  { fill: #fff; }
+.model-i.bw .i-globe-grid { stroke: #a0a0a0; }
+.model-i.bw .i-globe-land { fill: #fff; stroke: #555; }
+.model-i.bw .i-globe-rim  { stroke: #000; }
+.model-i.bw .i-title-globe,
+.model-i.bw .i-sec-globe { color: #000; }
+.model-i.bw .i-sec-pts { background: #000; }
+.model-i.bw .i-q { border-color: #000; }
+.model-j.bw .j-pediment path:first-child { fill: #fff; }
+.model-j.bw .j-tabula-in { background: #fff; color: #000; }
+
+/* =====================================================================
+   MODEL K — ÉLÉGANT (diplôme : bordure guillochée, lauriers, coins marqués)
+===================================================================== */
+.exam-a4.model-k { padding: 16mm 16mm 15mm; color: #000; }
+
+/* Guilloche band: two interlaced waves between two rails */
+.model-k .k-band {
+  position: absolute;
+  inset: 5.5mm;
+  border: 1.3px solid #1f3a5f;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 16'%3E%3Cg fill='none' stroke='%231f3a5f' stroke-width='1'%3E%3Cpath d='M0 8C5 1 5 1 10 8S15 15 20 8M0 8C5 15 5 15 10 8S15 1 20 8'/%3E%3Cpath d='M0 4.5C5 0 5 0 10 4.5S15 9 20 4.5M0 11.5C5 16 5 16 10 11.5S15 7 20 11.5' stroke-width='.5'/%3E%3C/g%3E%3C/svg%3E") left top / 5mm 4mm repeat-x,
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 16'%3E%3Cg fill='none' stroke='%231f3a5f' stroke-width='1'%3E%3Cpath d='M0 8C5 1 5 1 10 8S15 15 20 8M0 8C5 15 5 15 10 8S15 1 20 8'/%3E%3Cpath d='M0 4.5C5 0 5 0 10 4.5S15 9 20 4.5M0 11.5C5 16 5 16 10 11.5S15 7 20 11.5' stroke-width='.5'/%3E%3C/g%3E%3C/svg%3E") left bottom / 5mm 4mm repeat-x,
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 20'%3E%3Cg fill='none' stroke='%231f3a5f' stroke-width='1' transform='rotate(90 8 8)'%3E%3Cpath d='M0 8C5 1 5 1 10 8S15 15 20 8M0 8C5 15 5 15 10 8S15 1 20 8'/%3E%3Cpath d='M0 4.5C5 0 5 0 10 4.5S15 9 20 4.5M0 11.5C5 16 5 16 10 11.5S15 7 20 11.5' stroke-width='.5'/%3E%3C/g%3E%3C/svg%3E") left top / 4mm 5mm repeat-y,
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 20'%3E%3Cg fill='none' stroke='%231f3a5f' stroke-width='1' transform='rotate(90 8 8)'%3E%3Cpath d='M0 8C5 1 5 1 10 8S15 15 20 8M0 8C5 15 5 15 10 8S15 1 20 8'/%3E%3Cpath d='M0 4.5C5 0 5 0 10 4.5S15 9 20 4.5M0 11.5C5 16 5 16 10 11.5S15 7 20 11.5' stroke-width='.5'/%3E%3C/g%3E%3C/svg%3E") right top / 4mm 5mm repeat-y;
+}
+.model-k .k-band::after {
+  content: '';
+  position: absolute;
+  inset: 4mm;
+  border: 1.3px solid #1f3a5f;
+  outline: .6px solid #1f3a5f;
+  outline-offset: -2.2mm;
+  background: #fff;
+}
+.model-k .k-corner { position: absolute; width: 8mm; height: 8mm; z-index: 2; color: #1f3a5f; }
+.model-k .k-corner svg { display: block; width: 100%; height: 100%; }
+.model-k .k-corner-tr { top: 3.5mm;    right: 3.5mm; }
+.model-k .k-corner-tl { top: 3.5mm;    left: 3.5mm; }
+.model-k .k-corner-br { bottom: 3.5mm; right: 3.5mm; }
+.model-k .k-corner-bl { bottom: 3.5mm; left: 3.5mm; }
+
+.model-k .fh-title { flex: 1.45; gap: 4px; color: #1f3a5f; font-size: 15.5pt; }
+.model-k .fh-side { font-size: 10pt; padding: 6px 8px; }
+.model-k .k-laurel { width: 7.5mm; height: 15mm; flex-shrink: 0; color: #3f6b35; }
+
+/* Section title centred between two rules with diamonds */
+.model-k .k-sec { display: flex; align-items: center; gap: 7px; margin: 5mm 0 3mm; color: #1f3a5f; }
+.model-k .k-line { flex: 1; border-top: 3px double currentColor; }
+.model-k .k-dia {
+  width: 2.6mm;
+  height: 2.6mm;
+  border: 1.3px solid currentColor;
+  transform: rotate(45deg);
+  flex-shrink: 0;
+  background: radial-gradient(currentColor 30%, transparent 34%);
+}
+.model-k .k-sec-title {
+  font-family: 'Cairo', sans-serif;
+  font-size: 14pt;
+  font-weight: 800;
+  white-space: nowrap;
+  padding: 0 4px;
+  color: #000;
+}
+.model-k .k-sec-pts { font-weight: 700; font-size: 12pt; }
+
+/* Questions: thin frame + bold corner marks */
+.model-k .k-q {
+  border: .8px solid #6b7c93;
+  padding: 8px 14px 11px;
+  margin-bottom: 3.5mm;
+  page-break-inside: avoid;
+  background:
+    linear-gradient(#1f3a5f, #1f3a5f) top right    / 6mm 2.2px no-repeat,
+    linear-gradient(#1f3a5f, #1f3a5f) top right    / 2.2px 6mm no-repeat,
+    linear-gradient(#1f3a5f, #1f3a5f) top left     / 6mm 2.2px no-repeat,
+    linear-gradient(#1f3a5f, #1f3a5f) top left     / 2.2px 6mm no-repeat,
+    linear-gradient(#1f3a5f, #1f3a5f) bottom right / 6mm 2.2px no-repeat,
+    linear-gradient(#1f3a5f, #1f3a5f) bottom right / 2.2px 6mm no-repeat,
+    linear-gradient(#1f3a5f, #1f3a5f) bottom left  / 6mm 2.2px no-repeat,
+    linear-gradient(#1f3a5f, #1f3a5f) bottom left  / 2.2px 6mm no-repeat;
+}
+.model-k .q-text { font-family: 'Cairo', sans-serif; font-size: 12pt; font-weight: 700; margin-bottom: 2mm; }
+
+/* Black & white */
+.model-k.bw .k-band {
+  border-color: #000;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 16'%3E%3Cg fill='none' stroke='%23000' stroke-width='1'%3E%3Cpath d='M0 8C5 1 5 1 10 8S15 15 20 8M0 8C5 15 5 15 10 8S15 1 20 8'/%3E%3Cpath d='M0 4.5C5 0 5 0 10 4.5S15 9 20 4.5M0 11.5C5 16 5 16 10 11.5S15 7 20 11.5' stroke-width='.5'/%3E%3C/g%3E%3C/svg%3E") left top / 5mm 4mm repeat-x,
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 16'%3E%3Cg fill='none' stroke='%23000' stroke-width='1'%3E%3Cpath d='M0 8C5 1 5 1 10 8S15 15 20 8M0 8C5 15 5 15 10 8S15 1 20 8'/%3E%3Cpath d='M0 4.5C5 0 5 0 10 4.5S15 9 20 4.5M0 11.5C5 16 5 16 10 11.5S15 7 20 11.5' stroke-width='.5'/%3E%3C/g%3E%3C/svg%3E") left bottom / 5mm 4mm repeat-x,
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 20'%3E%3Cg fill='none' stroke='%23000' stroke-width='1' transform='rotate(90 8 8)'%3E%3Cpath d='M0 8C5 1 5 1 10 8S15 15 20 8M0 8C5 15 5 15 10 8S15 1 20 8'/%3E%3Cpath d='M0 4.5C5 0 5 0 10 4.5S15 9 20 4.5M0 11.5C5 16 5 16 10 11.5S15 7 20 11.5' stroke-width='.5'/%3E%3C/g%3E%3C/svg%3E") left top / 4mm 5mm repeat-y,
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 20'%3E%3Cg fill='none' stroke='%23000' stroke-width='1' transform='rotate(90 8 8)'%3E%3Cpath d='M0 8C5 1 5 1 10 8S15 15 20 8M0 8C5 15 5 15 10 8S15 1 20 8'/%3E%3Cpath d='M0 4.5C5 0 5 0 10 4.5S15 9 20 4.5M0 11.5C5 16 5 16 10 11.5S15 7 20 11.5' stroke-width='.5'/%3E%3C/g%3E%3C/svg%3E") right top / 4mm 5mm repeat-y;
+}
+.model-k.bw .k-band::after { border-color: #000; outline-color: #000; }
+.model-k.bw .k-corner,
+.model-k.bw .fh-title,
+.model-k.bw .k-laurel,
+.model-k.bw .k-sec { color: #000; }
+.model-k.bw .k-q {
+  border-color: #000;
+  background:
+    linear-gradient(#000, #000) top right    / 6mm 2.2px no-repeat,
+    linear-gradient(#000, #000) top right    / 2.2px 6mm no-repeat,
+    linear-gradient(#000, #000) top left     / 6mm 2.2px no-repeat,
+    linear-gradient(#000, #000) top left     / 2.2px 6mm no-repeat,
+    linear-gradient(#000, #000) bottom right / 6mm 2.2px no-repeat,
+    linear-gradient(#000, #000) bottom right / 2.2px 6mm no-repeat,
+    linear-gradient(#000, #000) bottom left  / 6mm 2.2px no-repeat,
+    linear-gradient(#000, #000) bottom left  / 2.2px 6mm no-repeat;
+}
+
+/* =====================================================================
+   MODEL M — ROME (tresse de mosaïque, nœuds de Salomon, plaque à rivets, couronne de laurier)
+===================================================================== */
+.exam-a4.model-m { padding: 16mm 16mm 15mm; }
+.model-m .m-band {
+  position: absolute;
+  inset: 5.5mm;
+  border: 1.4px solid #8c2f1b;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 12'%3E%3Cg fill='none' stroke-linecap='round'%3E%3Cpath d='M-2 6C3 13 7 13 10 6S17 -1 22 6' stroke='%238c2f1b' stroke-width='3.6'/%3E%3Cpath d='M-2 6C3 13 7 13 10 6S17 -1 22 6' stroke='%23fff' stroke-width='1.5'/%3E%3Cpath d='M-2 6C3 -1 7 -1 10 6S17 13 22 6' stroke='%238c2f1b' stroke-width='3.6'/%3E%3Cpath d='M-2 6C3 -1 7 -1 10 6S17 13 22 6' stroke='%23fff' stroke-width='1.5'/%3E%3C/g%3E%3C/svg%3E") left top / 6.5mm 4mm repeat-x,
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 12'%3E%3Cg fill='none' stroke-linecap='round'%3E%3Cpath d='M-2 6C3 13 7 13 10 6S17 -1 22 6' stroke='%238c2f1b' stroke-width='3.6'/%3E%3Cpath d='M-2 6C3 13 7 13 10 6S17 -1 22 6' stroke='%23fff' stroke-width='1.5'/%3E%3Cpath d='M-2 6C3 -1 7 -1 10 6S17 13 22 6' stroke='%238c2f1b' stroke-width='3.6'/%3E%3Cpath d='M-2 6C3 -1 7 -1 10 6S17 13 22 6' stroke='%23fff' stroke-width='1.5'/%3E%3C/g%3E%3C/svg%3E") left bottom / 6.5mm 4mm repeat-x,
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 20'%3E%3Cg fill='none' stroke-linecap='round' transform='rotate(90 6 6)'%3E%3Cpath d='M-2 6C3 13 7 13 10 6S17 -1 22 6' stroke='%238c2f1b' stroke-width='3.6'/%3E%3Cpath d='M-2 6C3 13 7 13 10 6S17 -1 22 6' stroke='%23fff' stroke-width='1.5'/%3E%3Cpath d='M-2 6C3 -1 7 -1 10 6S17 13 22 6' stroke='%238c2f1b' stroke-width='3.6'/%3E%3Cpath d='M-2 6C3 -1 7 -1 10 6S17 13 22 6' stroke='%23fff' stroke-width='1.5'/%3E%3C/g%3E%3C/svg%3E") left top / 4mm 6.5mm repeat-y,
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 20'%3E%3Cg fill='none' stroke-linecap='round' transform='rotate(90 6 6)'%3E%3Cpath d='M-2 6C3 13 7 13 10 6S17 -1 22 6' stroke='%238c2f1b' stroke-width='3.6'/%3E%3Cpath d='M-2 6C3 13 7 13 10 6S17 -1 22 6' stroke='%23fff' stroke-width='1.5'/%3E%3Cpath d='M-2 6C3 -1 7 -1 10 6S17 13 22 6' stroke='%238c2f1b' stroke-width='3.6'/%3E%3Cpath d='M-2 6C3 -1 7 -1 10 6S17 13 22 6' stroke='%23fff' stroke-width='1.5'/%3E%3C/g%3E%3C/svg%3E") right top / 4mm 6.5mm repeat-y;
+}
+.model-m .m-band::after {
+  content: '';
+  position: absolute;
+  inset: 4mm;
+  border: 1.4px solid #8c2f1b;
+  background: #fff;
+}
+.model-m .m-corner { position: absolute; width: 9mm; height: 9mm; z-index: 2; color: #8c2f1b; }
+.model-m .m-corner svg { display: block; width: 100%; height: 100%; }
+.model-m .m-corner-tr { top: 3mm;    right: 3mm; }
+.model-m .m-corner-tl { top: 3mm;    left: 3mm; }
+.model-m .m-corner-br { bottom: 3mm; right: 3mm; }
+.model-m .m-corner-bl { bottom: 3mm; left: 3mm; }
+
+/* Cornice with dentils above the header */
+.model-m .m-attic {
+  height: 3mm;
+  margin: 0 1mm -1mm;
+  border-top: 1.6px solid #8c2f1b;
+  background: repeating-linear-gradient(90deg, #8c2f1b 0 2mm, transparent 2mm 3.4mm) center / 100% 1.6mm no-repeat;
+}
+.model-m .fh-title { padding: 5px 7px; }
+.model-m .m-plaque {
+  position: relative;
+  width: 100%;
+  border: 1.6px solid #8c2f1b;
+  outline: .7px solid #8c2f1b;
+  outline-offset: -4px;
+  padding: 7px 14px;
+  color: #000;
+}
+.model-m .m-rivet {
+  position: absolute;
+  width: 2.2mm;
+  height: 2.2mm;
+  border: 1.2px solid #8c2f1b;
+  border-radius: 50%;
+  background: radial-gradient(#8c2f1b 35%, #fff 40%);
+}
+.model-m .m-rivet-tl { top: 2.5px;    right: 2.5px; }
+.model-m .m-rivet-tr { top: 2.5px;    left: 2.5px; }
+.model-m .m-rivet-bl { bottom: 2.5px; right: 2.5px; }
+.model-m .m-rivet-br { bottom: 2.5px; left: 2.5px; }
+
+.model-m .m-sec { display: flex; align-items: center; gap: 8px; margin: 4.5mm 0 2.5mm; color: #8c2f1b; }
+.model-m .m-wreath { position: relative; width: 11mm; height: 11mm; flex-shrink: 0; }
+.model-m .m-wreath-svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.model-m .m-wreath b {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 11pt;
+  color: #000;
+}
+.model-m .m-sec-title { font-family: 'Cairo', sans-serif; font-size: 13.5pt; font-weight: 800; color: #000; white-space: nowrap; }
+.model-m .m-line { flex: 1; border-top: 3px double currentColor; }
+.model-m .m-pts {
+  border: 1.6px solid currentColor;
+  padding: 0 10px;
+  font-family: 'Cairo', sans-serif;
+  font-size: 11pt;
+  font-weight: 800;
+  color: #000;
+  white-space: nowrap;
+}
+.model-m .m-q {
+  border: 3px double #8c2f1b;
+  padding: 7px 12px 10px;
+  margin-bottom: 3.5mm;
+  page-break-inside: avoid;
+}
+.model-m .q-text { font-family: 'Cairo', sans-serif; font-size: 12pt; font-weight: 700; margin-bottom: 2mm; }
+
+.model-m.bw .m-band {
+  border-color: #000;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 12'%3E%3Cg fill='none' stroke-linecap='round'%3E%3Cpath d='M-2 6C3 13 7 13 10 6S17 -1 22 6' stroke='%23000' stroke-width='3.6'/%3E%3Cpath d='M-2 6C3 13 7 13 10 6S17 -1 22 6' stroke='%23fff' stroke-width='1.5'/%3E%3Cpath d='M-2 6C3 -1 7 -1 10 6S17 13 22 6' stroke='%23000' stroke-width='3.6'/%3E%3Cpath d='M-2 6C3 -1 7 -1 10 6S17 13 22 6' stroke='%23fff' stroke-width='1.5'/%3E%3C/g%3E%3C/svg%3E") left top / 6.5mm 4mm repeat-x,
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 12'%3E%3Cg fill='none' stroke-linecap='round'%3E%3Cpath d='M-2 6C3 13 7 13 10 6S17 -1 22 6' stroke='%23000' stroke-width='3.6'/%3E%3Cpath d='M-2 6C3 13 7 13 10 6S17 -1 22 6' stroke='%23fff' stroke-width='1.5'/%3E%3Cpath d='M-2 6C3 -1 7 -1 10 6S17 13 22 6' stroke='%23000' stroke-width='3.6'/%3E%3Cpath d='M-2 6C3 -1 7 -1 10 6S17 13 22 6' stroke='%23fff' stroke-width='1.5'/%3E%3C/g%3E%3C/svg%3E") left bottom / 6.5mm 4mm repeat-x,
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 20'%3E%3Cg fill='none' stroke-linecap='round' transform='rotate(90 6 6)'%3E%3Cpath d='M-2 6C3 13 7 13 10 6S17 -1 22 6' stroke='%23000' stroke-width='3.6'/%3E%3Cpath d='M-2 6C3 13 7 13 10 6S17 -1 22 6' stroke='%23fff' stroke-width='1.5'/%3E%3Cpath d='M-2 6C3 -1 7 -1 10 6S17 13 22 6' stroke='%23000' stroke-width='3.6'/%3E%3Cpath d='M-2 6C3 -1 7 -1 10 6S17 13 22 6' stroke='%23fff' stroke-width='1.5'/%3E%3C/g%3E%3C/svg%3E") left top / 4mm 6.5mm repeat-y,
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 20'%3E%3Cg fill='none' stroke-linecap='round' transform='rotate(90 6 6)'%3E%3Cpath d='M-2 6C3 13 7 13 10 6S17 -1 22 6' stroke='%23000' stroke-width='3.6'/%3E%3Cpath d='M-2 6C3 13 7 13 10 6S17 -1 22 6' stroke='%23fff' stroke-width='1.5'/%3E%3Cpath d='M-2 6C3 -1 7 -1 10 6S17 13 22 6' stroke='%23000' stroke-width='3.6'/%3E%3Cpath d='M-2 6C3 -1 7 -1 10 6S17 13 22 6' stroke='%23fff' stroke-width='1.5'/%3E%3C/g%3E%3C/svg%3E") right top / 4mm 6.5mm repeat-y;
+}
+.model-m.bw .m-band::after { border-color: #000; }
+.model-m.bw .m-corner,
+.model-m.bw .m-sec { color: #000; }
+.model-m.bw .m-attic {
+  border-color: #000;
+  background: repeating-linear-gradient(90deg, #000 0 2mm, transparent 2mm 3.4mm) center / 100% 1.6mm no-repeat;
+}
+.model-m.bw .m-plaque,
+.model-m.bw .m-rivet { border-color: #000; outline-color: #000; }
+.model-m.bw .m-rivet { background: radial-gradient(#000 35%, #fff 40%); }
+.model-m.bw .m-q { border-color: #000; }
+
+/* =====================================================================
+   MODEL N — EL JEM (plan elliptique de l'amphithéâtre, façade à trois étages d'arcades)
+===================================================================== */
+.exam-a4.model-n { padding: 15mm 15mm 14mm; }
+.model-n .n-frame {
+  position: absolute;
+  inset: 6mm;
+  border: 1.8px solid #8a7350;
+  z-index: 1;
+  pointer-events: none;
+}
+.model-n .n-frame::after {
+  content: '';
+  position: absolute;
+  inset: 1.6mm;
+  border: .7px solid #8a7350;
+}
+/* Faint façade along the bottom of the page, behind the content */
+.model-n .n-facade {
+  position: absolute;
+  left: 6mm;
+  right: 6mm;
+  bottom: 6mm;
+  height: 23mm;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 34'%3E%3Cg fill='none' stroke='%23c9b48f' stroke-width='.9'%3E%3Cpath d='M0 1H16M3 11V6A5 5 0 0 1 13 6V11'/%3E%3Cpath d='M0 12H16M3 22V17A5 5 0 0 1 13 17V22'/%3E%3Cpath d='M0 23H16M3 33V28A5 5 0 0 1 13 28V33'/%3E%3Cpath d='M0 33.5H16'/%3E%3C/g%3E%3C/svg%3E") center bottom / 10.8mm 23mm repeat-x;
+  opacity: .8;
+  z-index: 0;
+}
+.model-n .fh-title { flex: 1.55; padding: 4px 6px; font-size: 14.5pt; }
+.model-n .fh-side { font-size: 10pt; padding: 6px 8px; }
+.model-n .n-arena { position: relative; width: 100%; color: #8a7350; padding: 6.5mm 10mm; }
+.model-n .n-arena-bg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.model-n .n-arena-text { position: relative; color: #000; }
+
+.model-n .n-sec { display: flex; align-items: center; gap: 8px; margin: 4.5mm 0 2.5mm; }
+.model-n .n-sec-title {
+  font-family: 'Cairo', sans-serif;
+  font-size: 13.5pt;
+  font-weight: 800;
+  white-space: nowrap;
+  border-bottom: 2px solid #8a7350;
+}
+.model-n .n-arcade {
+  flex: 1;
+  height: 4.6mm;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 10'%3E%3Cg fill='none' stroke='%238a7350' stroke-width='1'%3E%3Cpath d='M0 .6H12M0 9.4H12M2.5 9.4V5.5A3.5 3.5 0 0 1 9.5 5.5V9.4'/%3E%3C/g%3E%3C/svg%3E") right center / 5.5mm 4.6mm repeat-x;
+}
+.model-n .n-pts {
+  background: #000;
+  color: #fff;
+  border-radius: 3mm 3mm 0 0;
+  padding: 1px 12px;
+  font-family: 'Cairo', sans-serif;
+  font-size: 11pt;
+  font-weight: 800;
+  white-space: nowrap;
+}
+.model-n .n-q {
+  border: 1.3px solid #8a7350;
+  border-top: 3.5px double #8a7350;
+  padding: 7px 12px 10px;
+  margin-bottom: 3.5mm;
+  page-break-inside: avoid;
+}
+.model-n .q-text { font-family: 'Cairo', sans-serif; font-size: 12pt; font-weight: 700; margin-bottom: 2mm; }
+
+.model-n.bw .n-frame,
+.model-n.bw .n-frame::after { border-color: #000; }
+.model-n.bw .n-facade { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 34'%3E%3Cg fill='none' stroke='%239a9a9a' stroke-width='.9'%3E%3Cpath d='M0 1H16M3 11V6A5 5 0 0 1 13 6V11'/%3E%3Cpath d='M0 12H16M3 22V17A5 5 0 0 1 13 17V22'/%3E%3Cpath d='M0 23H16M3 33V28A5 5 0 0 1 13 28V33'/%3E%3Cpath d='M0 33.5H16'/%3E%3C/g%3E%3C/svg%3E"); opacity: .55; }
+.model-n.bw .n-arena { color: #000; }
+.model-n.bw .n-sec-title { border-color: #000; }
+.model-n.bw .n-arcade { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 10'%3E%3Cg fill='none' stroke='%23000' stroke-width='1'%3E%3Cpath d='M0 .6H12M0 9.4H12M2.5 9.4V5.5A3.5 3.5 0 0 1 9.5 5.5V9.4'/%3E%3C/g%3E%3C/svg%3E"); }
+.model-n.bw .n-q { border-color: #000; }
+
+/* =====================================================================
+   BLACK & WHITE MODE (.bw) — pure black on white for printing and photocopies:
+   no tinted backgrounds (they turn into speckled grey on a copier), black lines,
+   slightly heavier small text. Applies to every model; the preview shows the result.
+===================================================================== */
+.exam-a4.bw { color: #000; }
+.bw .dotted-line { border-bottom-color: #000; }
+.deco.bw .dotted-line { background-image: radial-gradient(circle, #000 .75px, transparent 1.05px); }
+.bw .timeline-wrap line,
+.bw .timeline-wrap polygon { stroke: #000; }
+.bw .timeline-wrap polygon { fill: #000; }
+.bw .timeline-wrap foreignObject div { font-weight: 600 !important; color: #000 !important; }
+.bw .q-table th { background: #fff; border-bottom: 3px double #000; }
+.bw .q-table th, .bw .q-table td { border-color: #000; }
+.bw .map-img { filter: grayscale(1) contrast(1.15); border-color: #000; }
+.bw .legend-num, .bw .map-legend-box { border-color: #000; }
+.bw .exam-closing, .bw .orn-sep { color: #000; }
+.bw .stu-gen-line { border-bottom-color: #000; }
+
+/* Model B */
+.exam-a4.model-b.bw { border-color: #000; }
+.model-b.bw .exam-inner,
+.model-b.bw .hdr-box,
+.model-b.bw .grade-box-b,
+.model-b.bw .q-box { border-color: #000; }
+.model-b.bw .hdr-box-c { background: #fff; border-width: 2px; }
+.model-b.bw .sec-pill { background: #000; }
+.model-b.bw .separator,
+.model-b.bw .hw-note { color: #000; }
+
+/* Model C — Décoré */
+.model-c.bw .c-frame-outer,
+.model-c.bw .c-frame-inner,
+.model-c.bw .c-hdr-side,
+.model-c.bw .q-box { border-color: #000; }
+.model-c.bw .c-hdr-title {
+  background: #fff;
+  border-color: #000;
+  box-shadow: inset 0 0 0 3px #fff, inset 0 0 0 4px #000;
+}
+.model-c.bw .c-sep { color: #000; }
+.model-c.bw .c-sep span { border-color: #000; }
+.model-c.bw .c-banner-dark { background: #000; border-color: #000; }
+.model-c.bw .c-banner-light {
+  background: #fff;
+  color: #000;
+  border-color: #000;
+  box-shadow: inset 0 0 0 2px #fff, inset 0 0 0 3px #000;
+}
+.model-c.bw .c-europe { fill: none; stroke: #8c8c8c; opacity: .5; }
+.model-c.bw .c-graticule { stroke: #8c8c8c; }
+.model-c.bw .c-compass circle { stroke: #000; }
+.model-c.bw .c-compass g { fill: #000; stroke: #000; }
+.model-c.bw .c-wm-europe .c-compass { opacity: .75; }
+.model-c.bw .c-watermark img { filter: grayscale(1); }
+
+/* Model D — Manuscrit */
+.exam-a4.model-d.bw { color: #000; }
+.model-d.bw .d-roll,
+.model-d.bw .d-roll::before,
+.model-d.bw .d-roll::after { background: #fff; border-color: #000; }
+.model-d.bw .d-sheet,
+.model-d.bw .d-sheet::before { border-color: #000; }
+.model-d.bw .cartouche-bg path { stroke: #000; }
+.model-d.bw .cartouche-bg path:first-child { fill: #fff; }
+.model-d.bw .d-cartouche { color: #000; }
+.model-d.bw .d-flourish { stroke: #000; }
+.model-d.bw .d-flourish circle { fill: #000; }
+.model-d.bw .d-seal { border-color: #000; box-shadow: inset 0 0 0 2px #fff, inset 0 0 0 3px #000; }
+.model-d.bw .d-ribbon { background: #000; }
+.model-d.bw .d-ribbon span { background: #fff; color: #000; }
+.model-d.bw .d-q { border-right-color: #000; }
+.model-d.bw .exam-closing { color: #000; }
+
+/* Model G — Fil du temps */
+.model-g.bw .g-stop-k { color: #000; }
+.model-g.bw .g-q { border-color: #000; }
+
+/* Model H — Archives */
+.model-h.bw .h-frame { border-color: #000; }
+.model-h.bw .h-hole { background: #fff; border-color: #000; }
+.model-h.bw .h-clip { stroke: #000; }
+.model-h.bw .h-tab,
+.model-h.bw .h-card-no { background: #fff; }
+.model-h.bw .h-card { border-color: #000; box-shadow: 2px 2px 0 #000; }
+.model-h.bw .h-card-head { border-color: #000; }
+.model-h.bw .h-stamp,
+.model-h.bw .h-grade-stamp { color: #000; border-color: #000; }
+
+/* =====================================================================
    PRINT STYLES
 ===================================================================== */
 @media print {
@@ -1820,6 +2294,7 @@ label.btn { cursor: pointer; }
   .page-guide      { display: none !important; }
   .modal-backdrop  { display: none !important; }
   .toast           { display: none !important; }
+  .preview-actions { display: none !important; }
   .mobile-tabs     { display: none !important; }
 
   #form-panel {
@@ -1946,6 +2421,8 @@ label.btn { cursor: pointer; }
     min-height: 0;
     padding: 16px 12px 28px;
   }
+
+  .preview-actions { display: flex; justify-content: center; }
 
   /* Tab-driven visibility (JS toggles .show-preview on #screen-app) */
   #screen-app:not(.show-preview) #preview-panel { display: none; }

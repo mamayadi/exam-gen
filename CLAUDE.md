@@ -21,6 +21,7 @@ exam-gen/
 │   │   └── style.css       ← Tous les styles UI + modèles + @media print
 │   └── js/
 │       ├── europe-map.js   ← Fond de carte d'Europe (SVG, Natural Earth, domaine public)
+│       ├── globe-map.js    ← Globe orthographique centré sur la Tunisie (modèle Globe)
 │       └── app.js          ← État, rendu, formulaire, SVG, impression, JSON
 ├── docs/
 │   └── agent.md            ← Contexte domaine pour agents IA
@@ -56,7 +57,7 @@ let S = {
     }
   ],
   decor: { watermark: 'europe' | 'compass' | 'image' | 'none', imageData, imageName }, // filigrane du Modèle C
-  opts:  { icons: boolean, closing: string, autoModel: boolean },            // options communes
+  opts:  { icons: boolean, closing: string, autoModel: boolean, bw: boolean }, // bw = classe .bw (noir et blanc)            // options communes
   title: string,          // thème/chapitre facultatif ; nom affiché = autoTitle() (en-tête) + thème — voir examTitle()
   docId: string | null    // id dans la bibliothèque (null = jamais enregistré)
 }
