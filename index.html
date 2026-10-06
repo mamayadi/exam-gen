@@ -12,65 +12,9 @@
 <body>
 
 <!-- =====================================================================
-     SCREEN 1 — MODEL SELECTION
+     MAIN APP
 ===================================================================== -->
-<div id="screen-model" class="screen active">
-  <h1 class="app-title">Générateur d'Examens</h1>
-  <p class="app-subtitle">Histoire &amp; Géographie — Collège tunisien (7e, 8e, 9e année)</p>
-
-  <div class="model-grid">
-
-    <!-- Modèle A -->
-    <div class="model-card" onclick="selectModel('A')">
-      <h3>Modèle A — Classique</h3>
-      <p>En-tête en tableau avec double filet, titres de sections soulignés, lignes pointillées pour les réponses.</p>
-      <div class="model-preview-box">
-        <div style="border:2.5px double #000; margin-bottom:5px;">
-          <table style="width:100%;border-collapse:collapse;">
-            <tr>
-              <td style="border:1px solid #000;padding:3px 5px;font-size:8.5px;width:30%">الأستاذة: ....</td>
-              <td style="border:1px solid #000;padding:3px 5px;font-size:8.5px;width:40%;text-align:center;font-weight:700">الفرض العادي عدد 1<br>في مادة التاريخ</td>
-              <td style="border:1px solid #000;padding:3px 5px;font-size:8.5px;width:30%;text-align:left">المستوى: التاسعة</td>
-            </tr>
-          </table>
-        </div>
-        <div style="font-size:8px;margin-bottom:4px">الإسم واللقب: .................. القسم: ........</div>
-        <div style="font-size:9px;font-weight:700;text-decoration:underline;margin:4px 0">القسم الأول (6 ن)</div>
-        <div style="font-size:8px;margin:2px 0">1- حرر فقرة متماسكة... <span style="font-size:7.5px">(3ن)</span></div>
-        <div style="border-bottom:1px dashed #888;margin:3px 0;height:4px"></div>
-        <div style="border-bottom:1px dashed #888;margin:3px 0;height:4px"></div>
-        <div style="border-bottom:1px dashed #888;margin:3px 0;height:4px"></div>
-      </div>
-    </div>
-
-    <!-- Modèle B -->
-    <div class="model-card" onclick="selectModel('B')">
-      <h3>Modèle B — Moderne</h3>
-      <p>Double cadre décoratif, en-tête à boîtes arrondies, titres de sections en pilules colorées.</p>
-      <div class="model-preview-box">
-        <div style="border:1.5px solid #555;border-radius:5px;padding:5px;outline:1px solid #999;outline-offset:3px;">
-          <div style="display:flex;gap:4px;direction:rtl;margin-bottom:5px;">
-            <div style="flex:1;border:1px solid #aaa;border-radius:5px;padding:3px 5px;font-size:8px;text-align:right">الأستاذة: ...<br>المدة: ساعة</div>
-            <div style="flex:1.5;border:1px solid #aaa;border-radius:5px;padding:3px 5px;font-size:8px;background:#f0f0f0;text-align:center;font-weight:700">الفرض العادي عدد 1<br>في مادة التاريخ</div>
-            <div style="flex:1;border:1px solid #aaa;border-radius:5px;padding:3px 5px;font-size:8px;text-align:left">التاسعة أساسي<br>2025 - 2026</div>
-          </div>
-          <div style="text-align:center;font-size:11px;color:#666;margin:2px 0;letter-spacing:4px">◆ ◆ ◆</div>
-          <div style="display:inline-block;background:#2d3436;color:#fff;border-radius:12px;padding:1px 10px;font-size:8px;margin:3px 0">القسم الأول (6 ن)</div><br>
-          <div style="border:1px solid #ccc;border-radius:4px;padding:4px 6px;font-size:8px;margin-top:3px">1- حرر فقرة متماسكة... <span style="font-size:7.5px">(3ن)</span>
-            <div style="border-bottom:1px dashed #aaa;margin:3px 0;height:3px"></div>
-            <div style="border-bottom:1px dashed #aaa;margin:3px 0;height:3px"></div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-  </div>
-</div>
-
-<!-- =====================================================================
-     SCREEN 2 — MAIN APP
-===================================================================== -->
-<div id="screen-app" class="screen">
+<div id="screen-app" class="screen active">
 
   <!-- Mobile tab bar — hidden on desktop via CSS -->
   <div id="mobile-tabs" class="mobile-tabs">
@@ -81,9 +25,10 @@
   <!-- FORM PANEL -->
   <div id="form-panel">
     <div class="fp-header">
-      <h2>Configuration de l'examen</h2>
+      <h2>Générateur d'Examens</h2>
       <div class="fp-header-actions">
-        <button class="btn btn-secondary btn-sm" onclick="changeModel()">← Modèle</button>
+        <button class="btn btn-light btn-sm" onclick="openLibrary()">📚 Mes examens</button>
+        <button class="btn btn-light btn-sm" onclick="newExam()">➕ Nouvel examen</button>
       </div>
     </div>
 
@@ -98,19 +43,64 @@
       <div id="exam-a4" class="exam-a4"></div>
     </div>
 
-    <div class="preview-toolbar">
-      <button class="btn btn-success" id="btn-print" onclick="printExam()">🖨 Imprimer / PDF</button>
-      <button class="btn btn-primary" onclick="saveExam()">💾 Sauvegarder JSON</button>
-      <label class="btn btn-secondary" style="cursor:pointer;">
-        📂 Charger JSON
-        <input type="file" accept=".json" onchange="loadExam(event)" style="display:none">
-      </label>
-      <button class="btn btn-warning" onclick="resetExam()">↺ Réinitialiser</button>
-    </div>
   </div>
 
 </div>
 
+<!-- Short printing help (shown before the browser print dialog) -->
+<div id="print-help" class="modal-backdrop" hidden>
+  <div class="modal" role="dialog" aria-labelledby="print-help-title">
+    <h3 id="print-help-title">🖨 Imprimer ou créer un PDF</h3>
+    <p id="print-help-over" class="modal-warn" hidden>
+      ⚠ Attention : l'examen fait plus d'une page.</p>
+    <ol>
+      <li>Une fenêtre d'impression va s'ouvrir.</li>
+      <li><b>Pour un fichier PDF</b> : à la ligne « Destination », choisissez
+        <b>« Enregistrer au format PDF »</b>, puis cliquez sur <b>Enregistrer</b>.</li>
+      <li><b>Pour imprimer sur papier</b> : choisissez votre imprimante, puis <b>Imprimer</b>.</li>
+    </ol>
+    <label class="chk"><input type="checkbox" id="print-help-skip"> Ne plus afficher ce message</label>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closePrintHelp(false)">Annuler</button>
+      <button class="btn btn-success" onclick="closePrintHelp(true)">Continuer ➜</button>
+    </div>
+  </div>
+</div>
+
+<!-- « Mes examens » library -->
+<div id="library" class="modal-backdrop" hidden onclick="if (event.target === this) closeLibrary()">
+  <div class="modal modal-lg" role="dialog" aria-labelledby="lib-title">
+    <div class="lib-head">
+      <h3 id="lib-title">📚 Mes examens</h3>
+      <button class="btn-icon" title="Fermer" onclick="closeLibrary()">✕</button>
+    </div>
+    <input id="lib-search" class="lib-search" type="search"
+      placeholder="🔍 Rechercher (nom, matière, niveau…)" oninput="renderLibraryList()">
+    <div id="lib-list" class="lib-list"></div>
+    <div class="lib-foot">
+      <p class="lib-note">Les examens sont gardés dans ce navigateur, sur cet ordinateur.
+        Pensez à faire de temps en temps une sauvegarde dans un fichier (clé USB, e-mail…).</p>
+      <div class="lib-foot-btns">
+        <button class="btn btn-ghost btn-sm" onclick="exportAll()">⬇ Sauvegarder tous mes examens</button>
+        <label class="btn btn-ghost btn-sm">⬆ Importer un fichier
+          <input type="file" accept=".json" hidden onchange="importFile(event)"></label>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Generic question dialog (askDialog) -->
+<div id="dialog" class="modal-backdrop dialog-top" hidden>
+  <div class="modal" role="alertdialog" aria-labelledby="dlg-title">
+    <h3 id="dlg-title"></h3>
+    <p id="dlg-text"></p>
+    <div id="dlg-btns" class="modal-actions"></div>
+  </div>
+</div>
+
+<div id="toast" class="toast" hidden></div>
+
+<script src="assets/js/europe-map.js"></script>
 <script src="assets/js/app.js"></script>
 </body>
 </html>

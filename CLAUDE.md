@@ -20,6 +20,7 @@ exam-gen/
 │   ├── css/
 │   │   └── style.css       ← Tous les styles UI + modèles + @media print
 │   └── js/
+│       ├── europe-map.js   ← Fond de carte d'Europe (SVG, Natural Earth, domaine public)
 │       └── app.js          ← État, rendu, formulaire, SVG, impression, JSON
 ├── docs/
 │   └── agent.md            ← Contexte domaine pour agents IA
@@ -34,7 +35,7 @@ exam-gen/
 
 ```js
 let S = {
-  model: 'A' | 'B',
+  model: 'A'…'H',            // voir MODELS ; C (Décoré) par défaut
   header: {
     teacherGender, teacherName, duration,
     examType, examNumber, subject, level, yearStart
@@ -46,16 +47,28 @@ let S = {
       questions: [
         {
           id: number,
-          type: 'paragraph' | 'definition' | 'timeline' | 'map',
+          type: 'paragraph' | 'definition' | 'timeline' | 'map' | 'table',
           text: string,
           points: number,
           params: { ... }   // dépend du type
         }
       ]
     }
-  ]
+  ],
+  decor: { watermark: 'europe' | 'compass' | 'image' | 'none', imageData, imageName }, // filigrane du Modèle C
+  opts:  { icons: boolean, closing: string, autoModel: boolean },            // options communes
+  title: string,          // thème/chapitre facultatif ; nom affiché = autoTitle() (en-tête) + thème — voir examTitle()
+  docId: string | null    // id dans la bibliothèque (null = jamais enregistré)
 }
 ```
+
+### Stockage (IndexedDB `examgen`)
+
+- Store `exams` (keyPath `id`) : `{ id, title, subject, level, examType, examNumber, model, createdAt, updatedAt, data: S }`.
+- Store `kv` : clé `draft` = JSON de l'examen en cours (brouillon, écrit 400 ms après chaque rendu via `scheduleAutosave()`).
+- `_savedJson` = version enregistrée ; `_dirty` = brouillon ≠ version enregistrée → statut « Modifications non enregistrées ».
+- Toute action qui remplace l'examen en cours (`newExam`, `openFromLibrary`) passe par `confirmLeave()`.
+- Les tests headless avec `--virtual-time-budget` ne laissent pas IndexedDB répondre : piloter Chrome via le protocole DevTools.
 
 ### Params par type de question
 
@@ -65,6 +78,7 @@ let S = {
 | `definition` | `{ lines: number }` (min 1) |
 | `timeline` | `{ count: number, events: string[] }` |
 | `map` | `{ imageData: string\|null, imageName: string, imageWidth: string, legendCount: number }` |
+| `table` | `{ cols: 1–6, rows: 1–10, cellHeight: 1–4, headers: string[], cells: string[][] }` (case vide = à compléter) |
 
 ---
 
@@ -95,11 +109,15 @@ Changement d'état
 
 ---
 
-## Ajouter un modèle
+## Ajouter un modèle (ex. I)
 
-1. **`style.css`** — Ajouter une section `MODEL C` avec les classes `.model-c .xxx`.
-2. **`app.js`** — Ajouter `function genExamC()` sur le modèle de `genExamA/B`, brancher dans `renderExam()`.
-3. **`index.html`** — Ajouter une `.model-card` dans `#screen-model` avec `onclick="selectModel('C')"`.
+1. **`style.css`** — Ajouter une section `MODEL I` avec les classes `.model-i .xxx`.
+2. **`app.js`** — Écrire `function genExamI()` (s'inspirer de `genExamD…H` et des helpers `qTitleHTML`, `closingHTML`, `studentLineHTML`, `ornSep`, `cartoucheSVG`).
+3. **`app.js — MODELS`** — Ajouter `{ id: 'I', label: 'Nom', gen: genExamI }` ; si la page est décorée pleine page, ajouter `'I'` à `DECO_MODELS`.
+4. La miniature du sélecteur est générée automatiquement (`getModelThumbs()`).
+5. Vérifier que l'examen type tient sur **une seule page A4** à l'impression.
+
+> Dans les SVG, ne pas utiliser d'`id` (`<pattern>`, `<defs>`…) : les miniatures dupliquent le rendu dans la page. Utiliser des images de fond CSS (data URI) à la place.
 
 ---
 
@@ -116,7 +134,7 @@ Changement d'état
 ## Styles d'impression
 
 `@media print` dans `style.css` :
-- Masque `#form-panel`, `.preview-toolbar`, `#screen-model`.
+- Masque `#form-panel` et `.preview-toolbar`.
 - Affiche `#preview-panel` en `display: block` avec `overflow: visible`.
 - `#print-zone` centré à `210mm`.
 - `.q-item` et `.q-box` ont `page-break-inside: avoid`.

@@ -28,7 +28,20 @@ exam-gen/
 ## Utilisation
 
 ### Étape 1 — Choisir le modèle
-Au démarrage, deux modèles sont proposés :
+L'application s'ouvre directement sur le formulaire. En haut, la carte **🎨 Modèle de l'examen** affiche une miniature de chaque modèle : un clic change le style de l'aperçu sans effacer les questions déjà saisies.
+
+Sept modèles sont disponibles (miniatures générées automatiquement à partir du vrai rendu) :
+
+| Modèle | Style |
+|---|---|
+| **Décoré** (par défaut) | Double cadre à coins grecs, titre accroché au cadre, bandeaux ardoise / parchemin, filigrane en bas de page : carte d'Europe + rose des vents (défaut), rose des vents + quadrillage, image personnalisée ou aucun |
+| **Manuscrit** | Parchemin enroulé, cartouche, rubans de section, sceau rond pour la note |
+| **Carte ancienne** | Bordure graduée noir/blanc avec degrés, cartouche, repères 📍 pour les points, échelle et rose des vents |
+| **Fil du temps** | En-tête en frise horizontale, ligne du temps verticale reliant sections (I, II…) et questions |
+| **Archives** | Feuille perforée + trombone, sections en onglets de classeur, questions en fiches, points en tampons |
+| **Classique** / **Moderne** | Modèles A et B d'origine |
+
+Options communes : icône par type de question (plume, livre, sablier, carte), phrase de fin (« بالتوفيق والنجاح »…), et style automatique selon la matière (Histoire → Manuscrit, Géographie → Carte ancienne). Dans les modèles décorés, une section contenant une seule question n'affiche pas de numéro.
 
 | Modèle A — Classique | Modèle B — Moderne |
 |---|---|
@@ -60,7 +73,7 @@ Le titre arabe est généré automatiquement :
 - Supprimer une section uniquement si l'examen en contient plus de 2.
 
 #### Questions
-Chaque section peut contenir plusieurs questions. Quatre types disponibles :
+Chaque section peut contenir plusieurs questions. Cinq types disponibles :
 
 **Paragraphe (فقرة)**  
 Énoncé suivi de N lignes pointillées (minimum 10, défaut 12).
@@ -78,6 +91,14 @@ Chaque section peut contenir plusieurs questions. Quatre types disponibles :
 - Régler la largeur : 50 % · 75 % · 100 %.
 - Ajouter optionnellement une légende numérotée à compléter.
 
+**Tableau (جدول)**
+- Choisir le nombre de colonnes (1 à 6), de lignes (1 à 10) et la hauteur des cases (1 à 4 lignes d'écriture).
+- Saisir les titres des colonnes (en-tête grisé) et, si besoin, le contenu de certaines cases.
+- Une case laissée vide est à compléter par l'élève.
+
+### Dépassement de page
+Si l'examen ne tient plus sur une page A4, une **ligne rouge en pointillés** apparaît dans l'aperçu à la fin de la page 1, et un message s'affiche sous le compteur de points.
+
 ### Validation du barème
 - Le total des sections ne peut **pas dépasser 18 ن** (les 2 points restants sont attribués à la qualité de l'expression).
 - Compteur permanent dans le pied du formulaire :
@@ -90,9 +111,10 @@ Chaque section peut contenir plusieurs questions. Quatre types disponibles :
 
 ## Impression / Export PDF
 
-Cliquer sur **🖨 Imprimer / PDF** (ou le bouton équivalent dans le pied du formulaire).  
-La boîte de dialogue d'impression du navigateur s'ouvre.  
-Pour obtenir un PDF, choisir **« Enregistrer en PDF »** comme imprimante.
+Cliquer sur **🖨 Imprimer / créer le PDF** (en bas du formulaire).
+Une petite fenêtre d'aide explique comment choisir « Enregistrer au format PDF » ou une imprimante
+(elle peut être masquée définitivement avec « Ne plus afficher ce message »),
+puis la boîte de dialogue d'impression du navigateur s'ouvre.
 
 - Format A4, marges zéro, rendu couleur fidèle.
 - Toute l'interface est masquée ; seul l'examen apparaît.
@@ -100,17 +122,40 @@ Pour obtenir un PDF, choisir **« Enregistrer en PDF »** comme imprimante.
 
 ---
 
-## Sauvegarde et chargement
+## Mes examens (enregistrement et historique)
 
-### Sauvegarder
-Cliquer sur **💾 Sauvegarder JSON** : un fichier `.json` est téléchargé contenant l'intégralité de l'examen (y compris les images encodées en base64).
+### Nom de l'examen
+Le nom est **automatique** et se met à jour en direct à partir de l'en-tête :
+`الفرض العادي عدد 1 – التاريخ – التاسعة أساسي – 2025/2026`.
+Le champ facultatif **Thème / chapitre** est ajouté à la fin (ex. `… – الحرب العالمية الأولى`).
+Ce nom sert à retrouver l'examen dans « Mes examens » ; il n'est pas imprimé.
 
-### Charger
-Cliquer sur **📂 Charger JSON** et sélectionner un fichier `.json` précédemment sauvegardé.  
-Le nom du professeur et l'année scolaire de la session en cours sont conservés.
+### Enregistrer
+**💾 Enregistrer** (en bas du formulaire) range l'examen dans **Mes examens**.
+L'état est indiqué en permanence : « ✓ Enregistré dans « Mes examens » à HH:MM »
+ou « ● Modifications non enregistrées ».
 
-### Réinitialiser
-**↺ Réinitialiser** efface toutes les sections et questions tout en conservant les informations d'en-tête.
+### 📚 Mes examens
+Liste des examens enregistrés, du plus récent au plus ancien, avec recherche. Pour chacun :
+**📂 Ouvrir** (pour le modifier), **⧉ Dupliquer** (copie, ex. pour l'année suivante),
+**⬇** (télécharger le fichier, pour l'envoyer) et **🗑** (supprimer, avec confirmation).
+
+### ➕ Nouvel examen
+Repart d'un examen vide en gardant l'en-tête. Si l'examen en cours a des modifications non
+enregistrées, l'application propose : Annuler / Ne pas enregistrer / Enregistrer.
+
+### Brouillon automatique
+L'examen en cours d'édition est gardé en continu : en cas de fermeture de l'onglet,
+il réapparaît à la réouverture (avec l'indication des modifications non enregistrées).
+
+### Sauvegarde de sécurité
+Les examens sont stockés **dans le navigateur, sur cet ordinateur** (IndexedDB).
+Dans « Mes examens » : **⬇ Sauvegarder tous mes examens** crée un fichier de sauvegarde ;
+**⬆ Importer un fichier** recharge une sauvegarde complète ou un examen seul (y compris les anciens fichiers `.json`).
+
+> ⚠ Ouvrir l'application toujours de la même façon (même adresse, même navigateur) :
+> l'adresse GitHub Pages et le fichier `index.html` ouvert depuis le disque ont chacun leur propre « Mes examens ».
+> Effacer les données de navigation du navigateur efface aussi Mes examens.
 
 ---
 
@@ -131,7 +176,7 @@ Les styles sont organisés par sections dans `style.css` :
 | `SHARED EXAM ELEMENTS` | Lignes, SVG timeline, carte, légende |
 | `PRINT STYLES` | `@media print` |
 
-Pour ajouter un **Modèle C** : créer une classe `.model-c` dans `style.css`, ajouter une branche dans `genExamC()` dans `app.js`, et ajouter une carte dans `#screen-model` dans `index.html`.
+Pour ajouter un **Modèle C** : créer une classe `.model-c` dans `style.css`, ajouter une branche dans `genExamC()` dans `app.js`, et ajouter une miniature dans `buildModelPickerHTML()`.
 
 ---
 
@@ -142,3 +187,4 @@ Pour ajouter un **Modèle C** : créer une classe `.model-c` dans `style.css`, a
 - SVG pour la frise chronologique (impression vectorielle nette)
 - `FileReader` API pour l'import d'images
 - `Blob` + `URL.createObjectURL` pour l'export JSON
+- Fond de carte d'Europe (`assets/js/europe-map.js`) généré à partir de [Natural Earth](https://www.naturalearthdata.com/) 1:50m — domaine public
